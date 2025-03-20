@@ -54,20 +54,20 @@ export const authService = {
    */
   login: async (data: LoginRequest): Promise<LoginResponse> => {
     const response = await apiClient.post<LoginResponse>('/auth/login', data);
-    
+
     // Stocker les tokens
     tokenManager.setTokens(response.data.accessToken, response.data.refreshToken);
-    
+
     return response.data;
   },
-  
+
   /**
    * Déconnecter l'utilisateur
    */
   logout: (): void => {
     tokenManager.clearTokens();
   },
-  
+
   /**
    * Rafraîchir le token d'accès
    * @param refreshToken Token de rafraîchissement
@@ -76,26 +76,26 @@ export const authService = {
     const response = await apiClient.post<RefreshTokenResponse>('/auth/refresh-token', {
       refreshToken,
     });
-    
+
     // Mettre à jour les tokens
     tokenManager.setTokens(response.data.accessToken, response.data.refreshToken);
-    
+
     return response.data;
   },
-  
+
   /**
    * Inscrire un nouvel utilisateur
    * @param data Données d'inscription
    */
   register: async (data: RegisterRequest): Promise<LoginResponse> => {
     const response = await apiClient.post<LoginResponse>('/auth/register', data);
-    
+
     // Stocker les tokens si l'inscription connecte automatiquement l'utilisateur
     tokenManager.setTokens(response.data.accessToken, response.data.refreshToken);
-    
+
     return response.data;
   },
-  
+
   /**
    * Demander un email de réinitialisation de mot de passe
    * @param data Données pour la réinitialisation
@@ -103,7 +103,7 @@ export const authService = {
   forgotPassword: async (data: ForgotPasswordRequest): Promise<void> => {
     await apiClient.post('/auth/forgot-password', data);
   },
-  
+
   /**
    * Réinitialiser le mot de passe avec un token
    * @param data Données pour la réinitialisation
@@ -111,24 +111,24 @@ export const authService = {
   resetPassword: async (data: ResetPasswordRequest): Promise<void> => {
     await apiClient.post('/auth/reset-password', data);
   },
-  
+
   /**
    * Vérifier si l'utilisateur est authentifié
    */
   isAuthenticated: (): boolean => {
     return tokenManager.isAuthenticated();
   },
-  
+
   /**
    * Récupérer la configuration Axios avec le token d'authentification
    */
   getAuthConfig: (): AxiosRequestConfig => {
     const token = tokenManager.getAccessToken();
-    
+
     if (!token) {
       return {};
     }
-    
+
     return {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -137,4 +137,4 @@ export const authService = {
   },
 };
 
-export default authService; 
+export default authService;

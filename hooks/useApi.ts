@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { AxiosRequestConfig } from 'axios';
-import { apiRequest, ApiResponse } from '@/services/api/client';
-import { ApiError, handleApiError } from '@/services/utils/errorHandler';
+import { apiRequest, ApiResponse } from '@/api/client';
+import { ApiError, handleApiError } from '@/utils/errorHandler';
 
 interface UseApiState<T> {
   data: T | null;
@@ -18,9 +18,7 @@ interface UseApiResult<T> extends UseApiState<T> {
  * Hook personnalisé pour effectuer des appels API avec gestion d'état et d'erreurs
  * @param defaultConfig Configuration Axios par défaut pour l'appel API
  */
-export const useApi = <T = any>(
-  defaultConfig?: AxiosRequestConfig
-): UseApiResult<T> => {
+export const useApi = <T = any>(defaultConfig?: AxiosRequestConfig): UseApiResult<T> => {
   // État local pour les données, le chargement et les erreurs
   const [state, setState] = useState<UseApiState<T>>({
     data: null,
@@ -79,4 +77,4 @@ export const useApi = <T = any>(
   };
 };
 
-export default useApi; 
+export default useApi;

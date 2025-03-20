@@ -1,7 +1,7 @@
 import { useQuery, useMutation, UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
 import { AxiosRequestConfig } from 'axios';
-import { apiRequest } from '@/services/api/client';
-import { ApiError, handleApiError } from '@/services/utils/errorHandler';
+import { apiRequest } from '@/api/client';
+import { ApiError, handleApiError } from '@/utils/errorHandler';
 
 export type QueryKeyT = [string, Record<string, unknown>?];
 
@@ -42,7 +42,7 @@ export function useApiMutation<TData = unknown, TVariables = unknown>(
   options?: Omit<UseMutationOptions<TData, ApiError, TVariables>, 'mutationKey' | 'mutationFn'>
 ) {
   const mutationKeyArray = Array.isArray(mutationKey) ? mutationKey : [mutationKey];
-  
+
   return useMutation<TData, ApiError, TVariables>({
     mutationKey: mutationKeyArray,
     mutationFn: async (variables: TVariables) => {
@@ -71,11 +71,11 @@ export function useApiInfiniteQuery<TData = unknown>(
 ) {
   return useQuery<TData, ApiError, TData, QueryKeyT>({
     queryKey,
-    queryFn: async (context) => {
+    queryFn: async context => {
       const pageParam = context.pageParam || 1;
-      
+
       try {
-        const config = apiConfigFn(pageParam);
+        const config = apiConfigFn(pageParam as number);
         const response = await apiRequest<TData>(config);
         return response.data;
       } catch (error) {
@@ -84,4 +84,4 @@ export function useApiInfiniteQuery<TData = unknown>(
     },
     ...options,
   });
-} 
+}

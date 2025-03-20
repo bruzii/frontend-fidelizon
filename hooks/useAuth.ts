@@ -6,8 +6,8 @@ import authService, {
   RegisterRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
-} from '@/services/api/endpoints/auth';
-import { useDispatch } from 'react-redux';
+} from '@/api/endpoints/auth';
+import { useAppDispatch } from '@/store/hooks';
 import { login, logout } from '@/store/slices/authSlice';
 
 /**
@@ -15,7 +15,7 @@ import { login, logout } from '@/store/slices/authSlice';
  */
 export function useAuth() {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   // Mutation pour la connexion
   const loginMutation = useApiMutation(
@@ -26,13 +26,15 @@ export function useAuth() {
       data,
     }),
     {
-      onSuccess: (data) => {
+      onSuccess: (data: any) => {
         // Mettre à jour le state Redux
-        dispatch(login({
-          user: data.user,
-          accessToken: data.accessToken,
-        }));
-        
+        dispatch(
+          login({
+            user: data.user,
+            accessToken: data.accessToken,
+          })
+        );
+
         // Rediriger vers le dashboard
         router.push('/dashboard');
       },
@@ -48,13 +50,15 @@ export function useAuth() {
       data,
     }),
     {
-      onSuccess: (data) => {
+      onSuccess: (data: any) => {
         // Mettre à jour le state Redux
-        dispatch(login({
-          user: data.user,
-          accessToken: data.accessToken,
-        }));
-        
+        dispatch(
+          login({
+            user: data.user,
+            accessToken: data.accessToken,
+          })
+        );
+
         // Rediriger vers le dashboard
         router.push('/dashboard');
       },
@@ -91,10 +95,10 @@ export function useAuth() {
   const handleLogout = useCallback(() => {
     // Appeler le service de déconnexion
     authService.logout();
-    
+
     // Mettre à jour le state Redux
     dispatch(logout());
-    
+
     // Rediriger vers la page de connexion
     router.push('/auth/login');
   }, [dispatch, router]);
@@ -115,4 +119,4 @@ export function useAuth() {
   };
 }
 
-export default useAuth; 
+export default useAuth;
