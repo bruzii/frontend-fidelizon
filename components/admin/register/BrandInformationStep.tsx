@@ -93,7 +93,7 @@ const BrandInformationStep: React.FC = () => {
               }}
             />
             <label htmlFor="no_brand_name" className="text-sm text-gray-600 ml-2">
-              Eu nao preciso de nome de marca, eu prefiro deixar somente o nome do estabelecimento'
+              Eu nao preciso de nome de marca, eu prefiro deixar somente o nome do estabelecimento
             </label>
           </div>
           {errors.network_name && (
