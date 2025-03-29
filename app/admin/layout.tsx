@@ -4,13 +4,20 @@
 import { Provider } from 'react-redux';
 import store from '@/store';
 import { Inter } from 'next/font/google';
-import { usePathname } from 'next/navigation';
+import { redirect, usePathname } from 'next/navigation';
 import ApiProvider from '@/providers/ApiProvider';
+import useAuth from '@/hooks/useAuth';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { isAuthenticated } = useAuth();
+  console.log({ isAuthenticated });
+
+  if (!isAuthenticated && pathname !== '/admin/auth/login' && pathname !== '/admin/auth/register') {
+    redirect('/admin/auth/login');
+  }
 
   // Check if the current path is login or register
 
