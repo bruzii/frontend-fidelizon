@@ -54,7 +54,7 @@ import { NextRequest, NextResponse } from 'next/server';
 //   return NextResponse.next();
 // }
 
-export function middleware(request) {
+export function middleware(request: NextRequest) {
   // Ne traiter que les requêtes non-statiques
   if (request.nextUrl.pathname.startsWith('/_next/')) {
     return NextResponse.next();
