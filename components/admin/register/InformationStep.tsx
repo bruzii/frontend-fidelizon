@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Eye, EyeOff } from 'lucide-react';
 import { usePreventRefresh } from '@/hooks/use-prevent-refresh';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const InformationStep: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -161,12 +162,8 @@ const InformationStep: React.FC = () => {
 
         <div className="md:col-span-2 mt-4">
           <div className="flex items-start">
-            <input
-              id="terms"
-              type="checkbox"
-              className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
-              required
-            />
+            <Checkbox id="terms" required />
+
             <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
               Ao clicar nesta caixa, eu reconheço ter lido e concordado com os{' '}
               <a href="#" className="text-black underline">
