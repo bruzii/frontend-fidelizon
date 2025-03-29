@@ -82,7 +82,7 @@ const BrandInformationStep: React.FC = () => {
             }`}
             {...register('network_name')}
           />
-          {/* put a checkbox, Eu nao preciso de nome de marca, eu prefiro deixar somente o nome do estabelecimento, use shadcn/ui, if the checkbox is checked, the network_name input should be disabled */}
+
           <div className="flex items-center mt-2">
             <Checkbox
               id="no_brand_name"
