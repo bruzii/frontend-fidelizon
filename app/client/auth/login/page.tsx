@@ -1,28 +1,30 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import useAuth from '@/hooks/useAuth';
+import useClientAuth from '@/hooks/useClientAuth';
+import { LoginDto } from '@/types/api';
 
-/**
- * Page de connexion
- */
-export default function LoginPage() {
+export default function ClientLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const router = useRouter();
-  const { login, isLoggingIn, loginError } = useAuth();
+  const { login, isLoggingIn, loginError } = useClientAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
+    const loginData: LoginDto = {
+      email,
+      password,
+    };
+
     try {
-      await login({ email, password });
-      // La redirection sera gérée par le hook useAuth
+      await login(loginData);
+      // La redirection est gérée dans le hook useClientAuth
     } catch (error) {
+      console.error('Erreur lors de la connexion client:', error);
       setError('Une erreur est survenue lors de la connexion.');
     }
   };
@@ -34,6 +36,7 @@ export default function LoginPage() {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Connexion à votre compte
           </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">Accédez à votre espace client</p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <input type="hidden" name="remember" defaultValue="true" />
@@ -87,7 +90,7 @@ export default function LoginPage() {
 
             <div className="text-sm">
               <Link
-                href="/auth/forgot-password"
+                href="/client/auth/forgot-password"
                 className="font-medium text-indigo-600 hover:text-indigo-500"
               >
                 Mot de passe oublié?
@@ -162,7 +165,7 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-gray-600">
             Vous n&apos;avez pas de compte ?{' '}
             <Link
-              href="/auth/register"
+              href="/client/auth/register"
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
               Inscrivez-vous

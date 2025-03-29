@@ -11,7 +11,9 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="md:w-1/2 mb-10 md:mb-0">
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">ADMINISTRATION FIDELIZON</h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                Fidélisez vos clients comme jamais auparavant
+              </h1>
               <p className="text-xl mb-8">
                 Fidelizon est la plateforme tout-en-un qui vous aide à créer, gérer et optimiser
                 votre programme de fidélité client.

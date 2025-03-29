@@ -1,5 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+// Clé pour le stockage local du token
+const AUTH_TOKEN_KEY = 'fidelizon_auth_token';
+const USER_DATA_KEY = 'fidelizon_user_data';
+
 // Interface pour l'utilisateur
 export interface User {
   id: string;
@@ -15,11 +19,34 @@ export interface AuthState {
   accessToken: string | null;
 }
 
-// État initial
+// Récupérer le token depuis le localStorage au démarrage
+const getStoredToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem(AUTH_TOKEN_KEY);
+  }
+  return null;
+};
+
+// Récupérer les données utilisateur depuis le localStorage au démarrage
+const getStoredUser = (): User | null => {
+  if (typeof window !== 'undefined') {
+    const userData = localStorage.getItem(USER_DATA_KEY);
+    if (userData) {
+      try {
+        return JSON.parse(userData);
+      } catch (e) {
+        return null;
+      }
+    }
+  }
+  return null;
+};
+
+// État initial avec valeurs stockées
 const initialState: AuthState = {
-  isAuthenticated: false,
-  user: null,
-  accessToken: null,
+  isAuthenticated: !!getStoredToken(),
+  user: getStoredUser(),
+  accessToken: getStoredToken(),
 };
 
 // Création du slice
@@ -31,22 +58,44 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.user = action.payload.user;
       state.accessToken = action.payload.accessToken;
+
+      // Stocker dans localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(AUTH_TOKEN_KEY, action.payload.accessToken);
+        localStorage.setItem(USER_DATA_KEY, JSON.stringify(action.payload.user));
+      }
     },
 
     logout: state => {
       state.isAuthenticated = false;
       state.user = null;
       state.accessToken = null;
+
+      // Supprimer du localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        localStorage.removeItem(USER_DATA_KEY);
+      }
     },
 
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
+
+        // Mettre à jour dans localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(USER_DATA_KEY, JSON.stringify(state.user));
+        }
       }
     },
 
     updateAccessToken: (state, action: PayloadAction<string>) => {
       state.accessToken = action.payload;
+
+      // Mettre à jour dans localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(AUTH_TOKEN_KEY, action.payload);
+      }
     },
   },
 });

@@ -1,122 +1,92 @@
-import { useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { useApiMutation } from './useApiQuery';
-import authService, {
-  LoginRequest,
-  RegisterRequest,
-  ForgotPasswordRequest,
-  ResetPasswordRequest,
-} from '@/api/endpoints/auth';
-import { useAppDispatch } from '@/store/hooks';
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { login, logout } from '@/store/slices/authSlice';
+import { tokenManager } from '@/utils/tokenManager';
+
+export type User = {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+};
+
+export type LoginCredentials = {
+  email: string;
+  password: string;
+};
+
+export type UseAuthReturn = {
+  isAuthenticated: boolean;
+  user: User | null;
+  accessToken: string | null;
+  login: (accessToken: string, user: User) => void;
+  logout: () => void;
+};
 
 /**
  * Hook personnalisé pour gérer l'authentification
+ * @returns Fonctions et états liés à l'authentification
  */
-export function useAuth() {
+const useAuth = (): UseAuthReturn => {
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useAppDispatch();
+  const { isAuthenticated, user, accessToken } = useAppSelector(state => state.auth);
 
-  // Mutation pour la connexion
-  const loginMutation = useApiMutation(
-    'login',
-    (data: LoginRequest) => ({
-      method: 'POST',
-      url: '/auth/login',
-      data,
-    }),
-    {
-      onSuccess: (data: any) => {
-        // Mettre à jour le state Redux
-        dispatch(
-          login({
-            user: data.user,
-            accessToken: data.accessToken,
-          })
-        );
+  // Synchroniser le state Redux avec localStorage au chargement
+  useEffect(() => {
+    const storedToken = tokenManager.getAccessToken();
+    const storedUser = tokenManager.getUserData<User>();
 
-        // Rediriger vers le dashboard
-        router.push('/dashboard');
-      },
+    if (storedToken && storedUser && !isAuthenticated) {
+      dispatch(
+        login({
+          user: storedUser,
+          accessToken: storedToken,
+        })
+      );
     }
-  );
+  }, [dispatch, isAuthenticated]);
 
-  // Mutation pour l'inscription
-  const registerMutation = useApiMutation(
-    'register',
-    (data: RegisterRequest) => ({
-      method: 'POST',
-      url: '/auth/register',
-      data,
-    }),
-    {
-      onSuccess: (data: any) => {
-        // Mettre à jour le state Redux
-        dispatch(
-          login({
-            user: data.user,
-            accessToken: data.accessToken,
-          })
-        );
+  // Fonction de connexion
+  const loginUser = (accessToken: string, user: User) => {
+    // Stocker dans localStorage via tokenManager
+    tokenManager.setTokens(accessToken);
+    tokenManager.setUserData(user);
 
-        // Rediriger vers le dashboard
-        router.push('/dashboard');
-      },
-    }
-  );
-
-  // Mutation pour la réinitialisation du mot de passe
-  const forgotPasswordMutation = useApiMutation(
-    'forgotPassword',
-    (data: ForgotPasswordRequest) => ({
-      method: 'POST',
-      url: '/auth/forgot-password',
-      data,
-    })
-  );
-
-  // Mutation pour la réinitialisation du mot de passe
-  const resetPasswordMutation = useApiMutation(
-    'resetPassword',
-    (data: ResetPasswordRequest) => ({
-      method: 'POST',
-      url: '/auth/reset-password',
-      data,
-    }),
-    {
-      onSuccess: () => {
-        // Rediriger vers la page de connexion après la réinitialisation
-        router.push('/auth/login');
-      },
-    }
-  );
+    // Mettre à jour Redux
+    dispatch(
+      login({
+        user,
+        accessToken,
+      })
+    );
+  };
 
   // Fonction de déconnexion
-  const handleLogout = useCallback(() => {
-    // Appeler le service de déconnexion
-    authService.logout();
+  const logoutUser = () => {
+    // Supprimer du localStorage via tokenManager
+    tokenManager.clearTokens();
 
-    // Mettre à jour le state Redux
+    // Mettre à jour Redux
     dispatch(logout());
 
-    // Rediriger vers la page de connexion
-    router.push('/auth/login');
-  }, [dispatch, router]);
+    // Rediriger vers la page de connexion si nécessaire
+    if (!pathname.includes('/auth/login')) {
+      router.push('/admin/auth/login');
+    }
+  };
 
   return {
-    isAuthenticated: authService.isAuthenticated(),
-    login: loginMutation.mutate,
-    register: registerMutation.mutate,
-    forgotPassword: forgotPasswordMutation.mutate,
-    resetPassword: resetPasswordMutation.mutate,
-    logout: handleLogout,
-    isLoggingIn: loginMutation.isPending,
-    isRegistering: registerMutation.isPending,
-    loginError: loginMutation.error,
-    registerError: registerMutation.error,
-    forgotPasswordError: forgotPasswordMutation.error,
-    resetPasswordError: resetPasswordMutation.error,
+    isAuthenticated,
+    user,
+    accessToken,
+    login: loginUser,
+    logout: logoutUser,
   };
-}
+};
 
 export default useAuth;

@@ -105,6 +105,10 @@ export type PartnerResponseDto = {
      * The network ID of the partner
      */
     network_id?: string;
+    /**
+     * The access token of the partner
+     */
+    accessToken?: string;
 };
 
 export type DomainUpdatePartnerDto = {
@@ -144,6 +148,55 @@ export type DomainUpdatePartnerDto = {
      * The default language of the partner
      */
     default_language?: string;
+};
+
+export type DomainCreateNetworkDto = {
+    /**
+     * The type of the network
+     */
+    type: 'independent' | 'franchise';
+    name?: string;
+    partner_id: string;
+};
+
+export type PointDto = {
+    type: 'Point';
+    coordinates: Array<number>;
+};
+
+export type CreateEstablishmentDto = {
+    location?: PointDto;
+    name: string;
+    public_establishment_id: string;
+    google_place_id?: string;
+    address: string;
+    neighborhood?: string;
+    city: string;
+    cep: string;
+};
+
+export type OnboardingPartnerDto = {
+    network: DomainCreateNetworkDto;
+    establishments: Array<CreateEstablishmentDto>;
+};
+
+export type OnboardingPartnerResponseDto = {
+    [key: string]: unknown;
+};
+
+export type StructuredFormatting = {
+    main_text: string;
+    secondary_text: string;
+};
+
+export type PredictionDto = {
+    place_id: string;
+    description: string;
+    structured_formatting: StructuredFormatting;
+};
+
+export type AutocompleteResponseDto = {
+    predictions: Array<PredictionDto>;
 };
 
 export type AuthControllerLoginData = {
@@ -231,6 +284,41 @@ export type PartnerControllerUpdateResponses = {
 
 export type PartnerControllerUpdateResponse = PartnerControllerUpdateResponses[keyof PartnerControllerUpdateResponses];
 
+export type PartnerControllerOnboardingData = {
+    body: OnboardingPartnerDto;
+    path?: never;
+    query?: never;
+    url: '/partners/onboarding';
+};
+
+export type PartnerControllerOnboardingResponses = {
+    /**
+     * The partner has been successfully onboarded.
+     */
+    200: unknown;
+    201: Array<OnboardingPartnerResponseDto>;
+};
+
+export type PartnerControllerOnboardingResponse = PartnerControllerOnboardingResponses[keyof PartnerControllerOnboardingResponses];
+
+export type PartnerControllerAutocompleteData = {
+    body?: never;
+    path?: never;
+    query: {
+        address: string;
+    };
+    url: '/partners/autocomplete';
+};
+
+export type PartnerControllerAutocompleteResponses = {
+    /**
+     * Returns autocomplete suggestions for an address.
+     */
+    200: AutocompleteResponseDto;
+};
+
+export type PartnerControllerAutocompleteResponse = PartnerControllerAutocompleteResponses[keyof PartnerControllerAutocompleteResponses];
+
 export type ClientOptions = {
-    baseUrl: 'https://Fidelizon-platform.dev.io' | (string & {});
+    baseUrl: 'http://localhost:3000' | (string & {});
 };

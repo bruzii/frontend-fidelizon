@@ -1,43 +1,44 @@
 /** @type {import('next').NextConfig} */
-
 const nextConfig = {
-  reactStrictMode: true,
-  images: {
-    domains: ['res.cloudinary.com', 'images.unsplash.com'],
-  },
-  experimental: {
-    serverActions: {
-      allowedOrigins: ['localhost:3000'],
-    },
-  },
-  async rewrites() {
-    return [
-      // Redirection pour l'application d'administration
-      {
-        source: '/admin/:path*',
-        destination: '/app/admin/:path*',
-      },
-      // Redirection pour l'application client
-      {
-        source: '/app/:path*',
-        destination: '/app/client/:path*',
-      },
-    ];
-  },
-  // Permet de configurer les domaines pour le site vitrine
+  // Configuration pour accepter les sous-domaines en mode développement
+  assetPrefix:'',
   async headers() {
     return [
       {
-        source: '/:path*',
+        source: '/_next/:path*',
         headers: [
-          {
-            key: 'x-custom-header',
-            value: 'my custom header value',
-          },
+          { key: 'Access-Control-Allow-Origin', value: '*' }
         ],
       },
     ];
   },
+  
+  crossOrigin: 'anonymous',
+  allowedDevOrigins: ['admin.localhost', 'client.localhost'],
+  
+  // Configuration des réécritures pour inclure les ressources statiques
+  // async rewrites() {
+  //   return {
+  //     beforeFiles: [
+  //       // Réécritures spécifiques pour les assets statiques (à placer avant les autres règles)
+  //       {
+  //         source: '/_next/:path*',
+  //         destination: '/_next/:path*',
+  //       },
+  //       // Réécritures pour les pages sur sous-domaines
+  //       {
+  //         source: '/:path*',
+  //         has: [{ type: 'host', value: 'admin.localhost' }],
+  //         destination: '/admin/:path*',
+  //       },
+  //       {
+  //         source: '/:path*',
+  //         has: [{ type: 'host', value: 'client.localhost' }],
+  //         destination: '/client/:path*',
+  //       },
+  //     ],
+  //   };
+  // },
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;
