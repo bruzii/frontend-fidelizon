@@ -4,17 +4,16 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
-import { useLogin } from '@/hooks/useLogin';
+import { useLoginAdmin } from '@/hooks/useLoginAdmin';
 import { FormProvider } from 'react-hook-form';
 
 export default function LoginPage() {
-  const { form, isSubmitting, showPassword, togglePasswordVisibility, onSubmit, errors } = useLogin(
-    {
+  const { form, isSubmitting, showPassword, togglePasswordVisibility, onSubmit, errors } =
+    useLoginAdmin({
       onError: error => {
         console.error('Login error:', error);
       },
-    }
-  );
+    });
 
   return (
     <div className="flex min-h-screen bg-floral-white">

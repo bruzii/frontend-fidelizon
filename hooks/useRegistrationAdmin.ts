@@ -5,13 +5,7 @@ import { useForm, UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import useAuth from './useAuth';
-import {
-  partnerControllerRegister,
-  partnerControllerOnboarding,
-  CreatePartnerDto,
-  OnboardingPartnerDto,
-  PartnerResponseDto,
-} from '@/types/api';
+import { partnerControllerRegister, partnerControllerOnboarding } from '@/types/api';
 import { RegistrationFormData, registrationSchema } from '@/schemas/auth.schema';
 import { establishmentSchema } from '@/schemas/auth.schema';
 import { z } from 'zod';
@@ -38,7 +32,9 @@ export interface UseRegistrationReturn {
 /**
  * Hook pour gérer le processus d'inscription multi-étapes
  */
-export const useRegistration = (options: UseRegistrationOptions = {}): UseRegistrationReturn => {
+export const useRegistrationAdmin = (
+  options: UseRegistrationOptions = {}
+): UseRegistrationReturn => {
   const { onSuccess, onError, defaultValues } = options;
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);

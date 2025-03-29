@@ -26,7 +26,7 @@ export interface UseLoginReturn {
 /**
  * Hook personnalisé pour gérer la logique de connexion
  */
-export const useLogin = (options: UseLoginOptions = {}): UseLoginReturn => {
+export const useLoginAdmin = (options: UseLoginOptions = {}): UseLoginReturn => {
   const { onSuccess, onError, defaultValues, redirectPath = '/admin/dashboard' } = options;
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

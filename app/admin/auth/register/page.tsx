@@ -13,14 +13,14 @@ import BrandInformationStep from '@/components/admin/register/BrandInformationSt
 import EstablishementStep from '@/components/admin/register/EstablishementStep';
 
 // Hooks
-import { useRegistration } from '@/hooks/useRegistration';
+import { useRegistrationAdmin } from '@/hooks/useRegistrationAdmin';
 
 /**
  * RegisterPage component - Handles the multi-step registration process
  */
 export default function RegisterPage() {
   // Initialiser le hook d'inscription
-  const { currentStep, totalSteps, isLoading, form, nextStep, prevStep } = useRegistration({
+  const { currentStep, totalSteps, isLoading, form, nextStep, prevStep } = useRegistrationAdmin({
     onError: error => {
       console.error('Registration error:', error);
       toast.error('Erro no processo de registro', {
