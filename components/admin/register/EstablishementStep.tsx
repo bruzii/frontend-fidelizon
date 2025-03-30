@@ -26,6 +26,7 @@ import { Badge } from '@/components/ui/badge';
 
 import { cn } from '@/lib/utils';
 import { partnerControllerAutocomplete } from '@/types/api';
+import { FormTextField } from '@/components/forms/form-text-field';
 
 // Types
 interface PredictionDto {
@@ -70,7 +71,6 @@ const EstablishmentStep: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Fonction pour rechercher des établissements
   const searchEstablishments = async (query: string) => {
     if (query.trim().length < 3) {
       setPredictions([]);
@@ -94,7 +94,6 @@ const EstablishmentStep: React.FC = () => {
     }
   };
 
-  // Debounced search
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchTerm) {
@@ -105,7 +104,6 @@ const EstablishmentStep: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Ajouter un nouvel établissement
   const addEstablishment = () => {
     append({
       name: '',
@@ -115,12 +113,10 @@ const EstablishmentStep: React.FC = () => {
       google_place_id: '',
     });
 
-    // Passer au nouvel onglet
     const newIndex = fields.length.toString();
     setActiveTab(newIndex);
   };
 
-  // Valider les champs de l'établissement actif
   const validateCurrentEstablishment = async () => {
     const fieldsToValidate = [
       `establishments.${activeTab}.name`,
@@ -132,16 +128,12 @@ const EstablishmentStep: React.FC = () => {
     return await trigger(fieldsToValidate as any);
   };
 
-  // Sélectionner une adresse dans l'autocomplétion
   const handleSelectAddress = (prediction: PredictionDto, index: number) => {
-    // Extraire les parties de l'adresse
     const { structured_formatting, place_id } = prediction;
     const addressParts = structured_formatting.secondary_text.split('- ');
 
-    // Tenter d'extraire le quartier et la ville
     let city = '';
     let neighborhood = '';
-    let cep = '';
 
     if (addressParts.length > 1) {
       const locationParts = addressParts[1].split(', ');
@@ -152,7 +144,6 @@ const EstablishmentStep: React.FC = () => {
       }
     }
 
-    // Mettre à jour les champs du formulaire
     setValue(`establishments.${index}.name`, structured_formatting.main_text);
     setValue(`establishments.${index}.address`, addressParts[0] || '');
     if (neighborhood) setValue(`establishments.${index}.neighborhood`, neighborhood);
@@ -368,109 +359,35 @@ const EstablishmentStep: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label
-                      htmlFor={`establishments.${index}.address`}
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Endereço*
-                    </label>
-                    <Input
-                      id={`establishments.${index}.address`}
-                      className={cn(
-                        getFieldError(index, 'address') ? 'border-red-500' : 'border-gray-300'
-                      )}
-                      {...register(`establishments.${index}.address`, {
-                        required: 'Este campo é obrigatório',
-                      })}
+                    <FormTextField
+                      name={`establishments.${index}.address`}
+                      label="Endereço"
+                      required
                     />
-                    {getFieldError(index, 'address') && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {String(getFieldError(index, 'address')?.message || '')}
-                      </p>
-                    )}
                   </div>
                   <div>
-                    <label
-                      htmlFor={`establishments.${index}.neighborhood`}
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Bairro
-                      <Badge variant="outline" className="ml-2 font-normal">
-                        Opcional
-                      </Badge>
-                    </label>
-                    <Input
-                      id={`establishments.${index}.neighborhood`}
-                      placeholder="Bairro"
-                      className={cn(
-                        getFieldError(index, 'neighborhood') ? 'border-red-500' : 'border-gray-300'
-                      )}
-                      {...register(`establishments.${index}.neighborhood`)}
+                    <FormTextField
+                      name={`establishments.${index}.neighborhood`}
+                      label="Bairro"
+                      required
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label
-                      htmlFor={`establishments.${index}.city`}
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Cidade*
-                    </label>
-                    <Input
-                      id={`establishments.${index}.city`}
-                      className={cn(
-                        getFieldError(index, 'city') ? 'border-red-500' : 'border-gray-300'
-                      )}
-                      {...register(`establishments.${index}.city`, {
-                        required: 'Este campo é obrigatório',
-                      })}
-                    />
-                    {getFieldError(index, 'city') && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {String(getFieldError(index, 'city')?.message || '')}
-                      </p>
-                    )}
+                    <FormTextField name={`establishments.${index}.city`} label="Cidade" required />
                   </div>
 
                   <div>
-                    <label
-                      htmlFor={`establishments.${index}.cep`}
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      CEP*
-                    </label>
-                    <Input
-                      id={`establishments.${index}.cep`}
-                      className={cn(
-                        getFieldError(index, 'cep') ? 'border-red-500' : 'border-gray-300'
-                      )}
-                      {...register(`establishments.${index}.cep`, {
-                        required: 'Este campo é obrigatório',
-                      })}
-                    />
-                    {getFieldError(index, 'cep') && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {String(getFieldError(index, 'cep')?.message || '')}
-                      </p>
-                    )}
+                    <FormTextField name={`establishments.${index}.cep`} label="CEP" required />
                   </div>
                 </div>
 
                 <div>
-                  <label
-                    htmlFor={`establishments.${index}.google_place_id`}
-                    className="block text-sm font-medium text-gray-700 mb-1 flex items-center"
-                  >
-                    Google Place ID
-                    <Badge variant="outline" className="ml-2 font-normal">
-                      Opcional
-                    </Badge>
-                  </label>
-                  <Input
-                    id={`establishments.${index}.google_place_id`}
-                    {...register(`establishments.${index}.google_place_id`)}
+                  <FormTextField
+                    name={`establishments.${index}.google_place_id`}
+                    label="Google Place ID"
                   />
                 </div>
               </CardContent>

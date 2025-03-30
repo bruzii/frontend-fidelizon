@@ -100,7 +100,8 @@ export const useRegistrationAdmin = (
 
     // Valider les champs de l'étape actuelle
     const isValid = await form.trigger(fieldsToValidate as any);
-
+    const errors = form.formState.errors;
+    console.log({ isValid, errors });
     if (isValid) {
       if (currentStep === 1) {
         await handlePartnerRegistration();

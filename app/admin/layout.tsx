@@ -13,7 +13,6 @@ const inter = Inter({ subsets: ['latin'] });
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
-  console.log({ isAuthenticated });
 
   if (!isAuthenticated && pathname !== '/admin/auth/login' && pathname !== '/admin/auth/register') {
     redirect('/admin/auth/login');
@@ -25,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <Provider store={store}>
           <ApiProvider>
             {isAuthPage ? (

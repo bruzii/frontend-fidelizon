@@ -74,25 +74,47 @@ export const useLoginAdmin = (options: UseLoginOptions = {}): UseLoginReturn => 
 
       if (response.data?.accessToken && response.data?.user) {
         const { accessToken, user } = response.data;
+        const { status } = user;
+        switch (status) {
+          case 'active':
+            auth.login(accessToken, {
+              id: user.id,
+              email: user.email,
+              name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+              role: user.accountType,
+            });
+            toast.success('Connexion réussie', {
+              description: 'Bienvenue sur votre espace administrateur',
+            });
 
-        // Connexion réussie, stocker le token et les informations de l'utilisateur
-        auth.login(accessToken, {
-          id: user.id,
-          email: user.email,
-          name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
-          role: user.accountType,
-        });
+            onSuccess?.();
 
-        // Notification de succès
-        toast.success('Connexion réussie', {
-          description: 'Bienvenue sur votre espace administrateur',
-        });
+            router.push(redirectPath);
+            break;
+          case 'waiting_verification':
+            toast.error('Conta Aguardando Verificação', {
+              description: 'Sua conta está aguardando a verificação, por favor contate o suporte',
+            });
+            router.push('/admin/auth/register');
+            break;
+          case 'paused':
+            toast.error('Conta Pausada', {
+              description: 'Sua conta está pausada, por favor contate o suporte',
+            });
+            break;
+          case 'waiting_payment':
+            toast.error('Conta Aguardando Pagamento', {
+              description: 'Sua conta está aguardando o pagamento, por favor contate o suporte',
+            });
+            router.push('/admin/auth/register');
+            break;
 
-        // Callback de succès
-        onSuccess?.();
-
-        // Redirection vers le tableau de bord
-        router.push(redirectPath);
+          default:
+            toast.error('Conta Inativa', {
+              description: 'Sua conta está inativa, por favor contate o suporte',
+            });
+            break;
+        }
       } else {
         throw new Error('Access token not received');
       }
@@ -107,7 +129,6 @@ export const useLoginAdmin = (options: UseLoginOptions = {}): UseLoginReturn => 
     }
   };
 
-  // Créer une fonction pour gérer la soumission du formulaire
   const onSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     form.handleSubmit(handleSubmit)(e);

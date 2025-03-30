@@ -12,11 +12,7 @@ interface ApiProviderProps {
  */
 export function ApiProvider({ children }: ApiProviderProps) {
   useEffect(() => {
-    // Ne configurer les intercepteurs qu'une seule fois
-    console.log('setupApiInterceptors');
-    // if (!isSetup) {
     setupApiInterceptors();
-    //   setIsSetup(true);
   }, []);
 
   return <>{children}</>;

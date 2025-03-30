@@ -4,6 +4,7 @@ import { Info, Upload } from 'lucide-react';
 import { usePreventRefresh } from '@/hooks/use-prevent-refresh';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CheckedState } from '@radix-ui/react-checkbox';
+import { FormTextField } from '@/components/forms/form-text-field';
 
 const BrandInformationStep: React.FC = () => {
   const {
@@ -68,19 +69,11 @@ const BrandInformationStep: React.FC = () => {
         </div>
 
         <div>
-          <label htmlFor="network_name" className="block text-sm font-medium text-gray-700 mb-1">
-            Nome da sua marca*
-          </label>
-          <input
-            id="network_name"
-            type="text"
+          <FormTextField
             disabled={noBrandName}
-            className={`block w-full rounded-md border ${
-              errors.network_name ? 'border-red-500' : 'border-gray-300'
-            } bg-gray-50 py-3 px-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black ${
-              noBrandName ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-            {...register('network_name')}
+            name="network_name"
+            label="Nome da sua marca"
+            required
           />
 
           <div className="flex items-center mt-2">
