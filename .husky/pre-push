@@ -1,4 +1,10 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+#!/bin/sh
 
-npm run build 
+echo "🏗️ Vérification du build..."
+yarn run build || {
+  echo "❌ Le build a échoué. Veuillez corriger les erreurs avant de push."
+  exit 1
+}
+
+echo "✅ Build réussi!"
+

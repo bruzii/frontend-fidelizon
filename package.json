@@ -15,7 +15,8 @@
     "clean:install": "yarn clean && yarn install",
     "api:generate": "openapi-ts --client \"@hey-api/client-fetch\" --input \"http://localhost:3000/documentation-json\" --output \"types/api\"",
     "type-check": "tsc --noEmit",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -84,6 +85,8 @@
     "@reduxjs/toolkit": "^2.6.1",
     "@tanstack/react-query": "^5.69.0",
     "axios": "^1.8.4",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.0",
     "prettier": "^3.5.3",
     "react-redux": "^9.2.0",
     "ts-node": "^10.9.2"
