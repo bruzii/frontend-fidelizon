@@ -5,10 +5,15 @@ import { useForm, UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import useAuth from './useAuth';
-import { partnerControllerRegister, partnerControllerOnboarding } from '@/types/api';
+import {
+  partnerControllerRegister,
+  partnerControllerOnboarding,
+  OnboardingPartnerDto,
+} from '@/types/api';
 import { RegistrationFormData, registrationSchema } from '@/schemas/auth.schema';
 import { establishmentSchema } from '@/schemas/auth.schema';
 import { z } from 'zod';
+import axios from 'axios';
 
 export interface UseRegistrationOptions {
   onSuccess?: () => void;
@@ -198,6 +203,7 @@ export const useRegistrationAdmin = (
       }
 
       // Préparer les établissements pour l'API
+      console.log({ formData });
       const establishmentsData = formData.establishments.map(
         (establishment: z.infer<typeof establishmentSchema>) => ({
           name: establishment.name,
@@ -209,21 +215,29 @@ export const useRegistrationAdmin = (
           cep: establishment.cep,
         })
       );
+      console.log({ establishmentsData });
 
-      const response = await partnerControllerOnboarding({
-        body: {
-          network: {
-            type: formData.network_type,
-            name: formData.network_name ?? undefined,
-            partner_id: partnerId,
-          },
-          establishments: establishmentsData,
+      const body: OnboardingPartnerDto = {
+        network: {
+          primary_color: formData.brand_color ?? '#000000',
+          type: formData.network_type,
+          name: formData.network_name ?? undefined,
+          partner_id: partnerId,
+        },
+        establishments: establishmentsData,
+        network_logo: formData.network_logo,
+      };
+
+      const response = await axios.post(`http://localhost:3000/partners/onboarding`, body, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${auth.accessToken}`,
         },
       });
 
-      if (response.response.status !== 201) {
-        toast.error((response?.error as any)?.error || 'Erro ao finalizar cadastro', {
-          description: (response?.error as any)?.message || '',
+      if (response.status !== 201) {
+        toast.error('Erro ao finalizar cadastro', {
+          description: response.data?.message || '',
           position: 'top-center',
         });
         return;

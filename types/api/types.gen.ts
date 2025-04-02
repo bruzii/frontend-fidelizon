@@ -180,6 +180,7 @@ export type DomainCreateNetworkDto = {
    */
   type: 'independent' | 'franchise';
   name?: string;
+  primary_color: string;
   partner_id: string;
 };
 
@@ -202,10 +203,30 @@ export type CreateEstablishmentDto = {
 export type OnboardingPartnerDto = {
   network: DomainCreateNetworkDto;
   establishments: Array<CreateEstablishmentDto>;
+  network_logo?: Blob | File;
 };
 
 export type OnboardingPartnerResponseDto = {
-  [key: string]: unknown;
+  /**
+   * L'ID de l'établissement
+   */
+  id: string;
+  /**
+   * Le nom de l'établissement
+   */
+  name: string;
+  /**
+   * L'adresse de l'établissement
+   */
+  address: string;
+  /**
+   * L'ID du réseau associé
+   */
+  network_id: string;
+  /**
+   * L'ID du partenaire
+   */
+  partner_id: string;
 };
 
 export type StructuredFormatting = {

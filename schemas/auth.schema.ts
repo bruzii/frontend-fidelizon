@@ -29,6 +29,7 @@ export const registrationSchema = z
     network_type: z.enum(['independent', 'franchise']).default('independent'),
     brand_color: z.string().optional(),
     brand_logo: z.any().optional(),
+    network_logo: z.instanceof(File).optional(),
 
     // Step 3: Restaurants Information
     establishments: z

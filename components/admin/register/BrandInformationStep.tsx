@@ -5,10 +5,10 @@ import { usePreventRefresh } from '@/hooks/use-prevent-refresh';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CheckedState } from '@radix-ui/react-checkbox';
 import { FormTextField } from '@/components/forms/form-text-field';
+import { FormImageUpload } from '@/components/forms/form-image-upload';
 
 const BrandInformationStep: React.FC = () => {
   const {
-    register,
     watch,
     setValue,
     formState: { errors },
@@ -27,7 +27,7 @@ const BrandInformationStep: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setValue('brand_logo', file);
+      setValue('network_logo', file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setLogoPreview(reader.result as string);
@@ -73,7 +73,7 @@ const BrandInformationStep: React.FC = () => {
             disabled={noBrandName}
             name="network_name"
             label="Nome da sua marca"
-            required
+            required={!noBrandName}
           />
 
           <div className="flex items-center mt-2">
@@ -82,7 +82,7 @@ const BrandInformationStep: React.FC = () => {
               checked={noBrandName}
               onCheckedChange={(value: CheckedState) => {
                 setNoBrandName(!!value);
-                setValue('network_name', null);
+                setValue('network_name', undefined);
               }}
             />
             <label htmlFor="no_brand_name" className="text-sm text-gray-600 ml-2">
@@ -98,36 +98,13 @@ const BrandInformationStep: React.FC = () => {
           <h3 className="text-lg font-medium mb-4">Identidade visual</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="brand_logo" className="block text-sm font-medium text-gray-700 mb-3">
-                Logo da marca (opcional)
-              </label>
-              <input
-                type="file"
-                id="brand_logo"
-                ref={fileInputRef}
-                className="hidden"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={handleFileChange}
-              />
-              <div
-                onClick={handleClickUpload}
-                className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50"
-              >
-                {logoPreview ? (
-                  <img src={logoPreview} alt="Preview" className="max-h-32 mb-2" />
-                ) : (
-                  <>
-                    <Upload className="w-10 h-10 text-gray-400 mb-2" />
-                    <p className="text-sm text-center text-gray-600">
-                      Clique para fazer upload
-                      <br />
-                      JPG, PNG, WEBP
-                    </p>
-                  </>
-                )}
-              </div>
-            </div>
+            <FormImageUpload
+              name="network_logo"
+              disabled={noBrandName}
+              label="Logo da marca (opcional)"
+              acceptedFormats="image/jpeg,image/png,image/webp"
+              defaultValue={watch('network_logo') ?? null}
+            />
 
             <div>
               <label htmlFor="brand_color" className=" text-sm font-medium text-gray-700 mb-3">
