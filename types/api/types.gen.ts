@@ -244,6 +244,18 @@ export type AutocompleteResponseDto = {
   predictions: Array<PredictionDto>;
 };
 
+export type EstablishmentResponseDto = {
+  location?: PointDto;
+  id: string;
+  name: string;
+  public_establishment_id: string;
+  google_place_id?: string;
+  address: string;
+  neighborhood?: string;
+  city: string;
+  cep: string;
+};
+
 export type AuthControllerLoginData = {
   body: LoginDto;
   path?: never;
@@ -369,6 +381,23 @@ export type PartnerControllerAutocompleteResponses = {
 
 export type PartnerControllerAutocompleteResponse =
   PartnerControllerAutocompleteResponses[keyof PartnerControllerAutocompleteResponses];
+
+export type EstablishmentControllerGetEstablishmentsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/establishments';
+};
+
+export type EstablishmentControllerGetEstablishmentsResponses = {
+  /**
+   * The establishments have been successfully retrieved.
+   */
+  200: Array<EstablishmentResponseDto>;
+};
+
+export type EstablishmentControllerGetEstablishmentsResponse =
+  EstablishmentControllerGetEstablishmentsResponses[keyof EstablishmentControllerGetEstablishmentsResponses];
 
 export type ClientOptions = {
   baseUrl: 'http://localhost:3000' | (string & {});

@@ -1,14 +1,4 @@
-'use client';
-
-import { useState } from 'react';
-
 export default function AdminDashboardPage() {
-  const [stats, setStats] = useState({
-    totalClients: 124,
-    activePrograms: 23,
-    monthlyRevenue: 45780,
-  });
-
   return (
     <div className="py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,7 +10,7 @@ export default function AdminDashboardPage() {
             <div className="px-4 py-5 sm:p-6">
               <dl>
                 <dt className="text-sm font-medium text-gray-500 truncate">Total des clients</dt>
-                <dd className="mt-1 text-3xl font-semibold text-gray-900">{stats.totalClients}</dd>
+                <dd className="mt-1 text-3xl font-semibold text-gray-900">124</dd>
               </dl>
             </div>
           </div>
@@ -28,9 +18,7 @@ export default function AdminDashboardPage() {
             <div className="px-4 py-5 sm:p-6">
               <dl>
                 <dt className="text-sm font-medium text-gray-500 truncate">Programmes actifs</dt>
-                <dd className="mt-1 text-3xl font-semibold text-gray-900">
-                  {stats.activePrograms}
-                </dd>
+                <dd className="mt-1 text-3xl font-semibold text-gray-900">00</dd>
               </dl>
             </div>
           </div>
@@ -38,9 +26,7 @@ export default function AdminDashboardPage() {
             <div className="px-4 py-5 sm:p-6">
               <dl>
                 <dt className="text-sm font-medium text-gray-500 truncate">Revenu mensuel (€)</dt>
-                <dd className="mt-1 text-3xl font-semibold text-gray-900">
-                  {stats.monthlyRevenue.toLocaleString()}
-                </dd>
+                <dd className="mt-1 text-3xl font-semibold text-gray-900">22</dd>
               </dl>
             </div>
           </div>

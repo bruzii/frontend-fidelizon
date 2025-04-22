@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { login, logout } from '@/store/slices/authSlice';
@@ -24,6 +24,7 @@ export type UseAuthReturn = {
   accessToken: string | null;
   login: (accessToken: string, user: User) => void;
   logout: () => void;
+  isLoading: boolean;
 };
 
 /**
@@ -33,6 +34,7 @@ export type UseAuthReturn = {
 const useAuth = (): UseAuthReturn => {
   const router = useRouter();
   const pathname = usePathname();
+  const [isLoading, setIsLoading] = useState(true);
   const dispatch = useAppDispatch();
   const { isAuthenticated, user, accessToken } = useAppSelector(state => state.auth);
 
@@ -49,6 +51,7 @@ const useAuth = (): UseAuthReturn => {
         })
       );
     }
+    setIsLoading(false);
   }, [dispatch, isAuthenticated]);
 
   // Fonction de connexion
@@ -86,6 +89,7 @@ const useAuth = (): UseAuthReturn => {
     accessToken,
     login: loginUser,
     logout: logoutUser,
+    isLoading,
   };
 };
 

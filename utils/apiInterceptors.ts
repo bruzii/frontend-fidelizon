@@ -17,7 +17,6 @@ export const setupAuthInterceptor = () => {
     if (typeof window === 'undefined') {
       return request;
     }
-    console.log({ request });
     // Ne pas ajouter de token pour les endpoints d'authentification
     const authEndpoints = ['/auth/login'];
     const url = new URL(request.url);
@@ -77,8 +76,6 @@ export const setupAuthErrorHandling = () => {
 export const setupApiInterceptors = () => {
   setupAuthInterceptor();
   setupAuthErrorHandling();
-
-  // Ajouter d'autres intercepteurs si nécessaire ici
 };
 
 export default setupApiInterceptors;

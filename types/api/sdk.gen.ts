@@ -19,6 +19,8 @@ import type {
   PartnerControllerOnboardingResponse,
   PartnerControllerAutocompleteData,
   PartnerControllerAutocompleteResponse,
+  EstablishmentControllerGetEstablishmentsData,
+  EstablishmentControllerGetEstablishmentsResponse,
 } from './types.gen';
 import { client as _heyApiClient } from './client.gen';
 
@@ -128,7 +130,7 @@ export const partnerControllerOnboarding = <ThrowOnError extends boolean = false
     url: '/partners/onboarding',
     ...options,
     headers: {
-      // 'Content-Type': null,
+      'Content-Type': null,
       ...options?.headers,
     },
   });
@@ -146,6 +148,22 @@ export const partnerControllerAutocomplete = <ThrowOnError extends boolean = fal
     ThrowOnError
   >({
     url: '/partners/autocomplete',
+    ...options,
+  });
+};
+
+/**
+ * Get all establishments by partner ID
+ */
+export const establishmentControllerGetEstablishments = <ThrowOnError extends boolean = false>(
+  options?: Options<EstablishmentControllerGetEstablishmentsData, ThrowOnError>
+) => {
+  return (options?.client ?? _heyApiClient).get<
+    EstablishmentControllerGetEstablishmentsResponse,
+    unknown,
+    ThrowOnError
+  >({
+    url: '/establishments',
     ...options,
   });
 };
