@@ -1,9 +1,10 @@
 'use client';
 
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, useState, useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import store from '@/store';
+import { initializeFromStorage } from './slices/establishmentsSlice';
 
 /**
  * Global providers wrapper component
@@ -22,6 +23,12 @@ export default function Providers({ children }: PropsWithChildren) {
         },
       })
   );
+
+  // Initialiser les données persistantes
+  useEffect(() => {
+    // Charger les préférences d'établissement depuis localStorage
+    store.dispatch(initializeFromStorage());
+  }, []);
 
   return (
     <Provider store={store}>

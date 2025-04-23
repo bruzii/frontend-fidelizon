@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -27,10 +27,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { establishmentControllerGetEstablishments } from '@/types/api';
-import { EstablishmentResponseDto } from '@/types/api/types.gen';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useClientApi } from '@/hooks/use-client-api';
+import { useEstablishments } from '@/hooks/useEstablishments';
 
 // Types
 interface SidebarItemProps {
@@ -179,10 +177,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ className }) => {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [establishments, setEstablishments] = useState<EstablishmentResponseDto[]>([]);
-  const [selectedEstablishment, setSelectedEstablishment] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
-  const clientApi = useClientApi();
+  const {
+    establishments,
+    selectedEstablishment,
+    selectedEstablishmentId,
+    isLoading,
+    setSelectedEstablishment,
+  } = useEstablishments();
+
   // Navigation items organisés par section
   const navSections: NavSection[] = [
     {
@@ -213,31 +215,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ className }) => {
     },
   ];
 
-  // Fetch establishments
-  useEffect(() => {
-    const fetchEstablishments = async () => {
-      setIsLoading(true);
-      if (!clientApi) return;
-      try {
-        const response = await establishmentControllerGetEstablishments({
-          client: clientApi,
-        });
-        if (response.data) {
-          setEstablishments(response.data);
-          if (response.data.length > 0 && !selectedEstablishment) {
-            setSelectedEstablishment(response.data[0].id);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching establishments:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchEstablishments();
-  }, [clientApi, selectedEstablishment]);
-
   const toggleCollapse = () => {
     setCollapsed(!collapsed);
   };
@@ -264,17 +241,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ className }) => {
           </Button>
         ) : (
           <Select
-            value={selectedEstablishment}
+            value={selectedEstablishment?.name}
             onValueChange={setSelectedEstablishment}
             disabled={isLoading}
           >
             <SelectTrigger className="w-full bg-transparent border-accent text-modules-beige hover:bg-accent/10">
               <SelectValue placeholder="Selecionar estabelecimento">
-                {establishments.find(e => e.id === selectedEstablishment)?.name
-                  ? truncateText(
-                      establishments.find(e => e.id === selectedEstablishment)?.name || '',
-                      20
-                    )
+                {selectedEstablishment?.name
+                  ? truncateText(selectedEstablishment.name, 20)
                   : 'Selecionar'}
               </SelectValue>
             </SelectTrigger>

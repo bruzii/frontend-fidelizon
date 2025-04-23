@@ -2,11 +2,13 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import adminAuthReducer from './slices/adminAuthSlice';
 import clientAuthReducer from './slices/clientAuthSlice';
+import establishmentsReducer from './slices/establishmentsSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   adminAuth: adminAuthReducer,
   clientAuth: clientAuthReducer,
+  establishments: establishmentsReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
