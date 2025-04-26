@@ -1,13 +1,9 @@
 import { useState } from 'react';
 import { useClientApi } from './use-client-api';
-import { toast } from 'sonner';
-import { UpdateEstablishmentProfileDto } from '@/types/api/types.gen';
 import {
   establishmentControllerUpdateEstablishmentProfile,
   establishmentControllerUploadEstablishmentProfilePictures,
 } from '@/types/api/sdk.gen';
-import axios from 'axios';
-import tokenManager from '@/utils/tokenManager';
 import { EstablishmentProfileFormValues } from '@/schemas/establishment.schema';
 
 interface UseEstablishmentProfileOptions {

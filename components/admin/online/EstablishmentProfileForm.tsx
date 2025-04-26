@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { FormTextField } from '@/components/forms/form-text-field';
@@ -8,35 +8,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import {
-  CheckCircle2,
-  Clock,
-  Facebook,
-  Globe,
-  Image as ImageIcon,
-  Instagram,
-  Loader2,
-} from 'lucide-react';
+import { CheckCircle2, Clock, Facebook, Globe, ImageIcon, Instagram, Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import { UpdateEstablishmentProfileDto } from '@/types/api/types.gen';
-import { certificationEnum, EstablishmentProfileFormValues } from '@/schemas/establishment.schema';
+import { EstablishmentProfileFormValues } from '@/schemas/establishment.schema';
 import { Input } from '@/components/ui/input';
 import { PhoneInputField } from '@/components/forms/phone-input-field';
-import {
-  findPictureByPosition,
-  getFileUrlFromFileOrUrl,
-  sortPicturesByPosition,
-} from '@/utils/file';
-
-const daysOfWeek = [
-  { value: 0, label: 'Domingo' },
-  { value: 1, label: 'Segunda' },
-  { value: 2, label: 'Terça' },
-  { value: 3, label: 'Quarta' },
-  { value: 4, label: 'Quinta' },
-  { value: 5, label: 'Sexta' },
-  { value: 6, label: 'Sábado' },
-];
+import { getFileUrlFromFileOrUrl } from '@/utils/file';
+import { useEstablishmentPictures } from '@/hooks/useEstablishmentPictures';
+import { useEstablishmentHours } from '@/hooks/useEstablishmentHours';
+import { useEstablishmentCertifications } from '@/hooks/useEstablishmentCertifications';
 
 type Props = {
   onSubmit: (data: EstablishmentProfileFormValues) => void;
@@ -45,109 +25,30 @@ type Props = {
 
 export default function EstablishmentProfileForm({ onSubmit, isLoading }: Props) {
   const [activeTab, setActiveTab] = useState('general');
-  const fileInputRefs = useRef<HTMLInputElement[]>([]);
 
+  const form = useFormContext<EstablishmentProfileFormValues>();
   const {
     register,
     handleSubmit,
     watch,
     setValue,
     formState: { errors },
-  } = useFormContext<EstablishmentProfileFormValues>();
+  } = form;
+
+  const { fileInputRefs, initializePictures, handleFileChange, removePicture, handleClickUpload } =
+    useEstablishmentPictures(form);
+
+  const { daysOfWeek, addOpeningHour, removeOpeningHour, toggleDayOpen } =
+    useEstablishmentHours(form);
+
+  const { certificationOptions, toggleCertification } = useEstablishmentCertifications(form);
 
   const formValues = watch();
-  console.log({ formValues });
+
   // Initialize picture slots if they don't exist
-  React.useEffect(() => {
-    // Initialize picture positions if not already set
-    [0, 1, 2].forEach(index => {
-      if (!formValues.pictures?.[index]) {
-        setValue(`pictures.${index}`, { position: index, file: undefined });
-      }
-    });
-  }, [formValues.pictures, setValue]);
-
-  const certificationOptions = [
-    { value: 'vegetarian' as const, label: 'Vegetariano' },
-    { value: 'vegan' as const, label: 'Vegano' },
-    { value: 'gluten_free' as const, label: 'Sem Glúten' },
-    { value: 'lactose_free' as const, label: 'Sem Lactose' },
-    { value: 'kosher' as const, label: 'Kosher' },
-    { value: 'halal' as const, label: 'Halal' },
-    { value: 'bio' as const, label: 'Bio/Orgânico' },
-  ];
-
-  const toggleCertification = (certification: typeof certificationEnum._type) => {
-    const current = watch('certifications') || [];
-    if (current.includes(certification)) {
-      setValue(
-        'certifications',
-        current.filter(c => c !== certification)
-      );
-    } else {
-      setValue('certifications', [...current, certification]);
-    }
-  };
-
-  const addOpeningHour = (dayIndex: number) => {
-    const days = [...(watch('opening_days') || [])];
-    if (days[dayIndex]) {
-      days[dayIndex].opening_hours.push({ start_time: '09:00', end_time: '18:00' });
-      setValue('opening_days', days);
-    }
-  };
-
-  const removeOpeningHour = (dayIndex: number, hourIndex: number) => {
-    const days = [...(watch('opening_days') || [])];
-    if (days[dayIndex] && days[dayIndex].opening_hours[hourIndex]) {
-      days[dayIndex].opening_hours.splice(hourIndex, 1);
-      setValue('opening_days', days);
-    }
-  };
-
-  const toggleDayOpen = (dayIndex: number, isOpen: boolean) => {
-    const days = [...(watch('opening_days') || [])];
-    if (days[dayIndex]) {
-      days[dayIndex].is_open = isOpen;
-      setValue(`opening_days.${dayIndex}.is_open`, isOpen);
-    }
-  };
-
-  const handleFileChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    console.log(watch('pictures'));
-    const pictures = [...(watch('pictures') || [])];
-    const newPictures = pictures.map((picture, i) => {
-      if (i === index) {
-        return { ...picture, file };
-      }
-      return picture;
-    });
-    setValue('pictures', newPictures);
-  };
-
-  const removePicture = (index: number) => {
-    console.log('removePictureIndex', index);
-    console.log('watch(pictures)', watch('pictures'));
-    // remove the picture using the index and the position
-    const pictures = [...(watch('pictures') || [])];
-    const newPictures = pictures.map((picture, i) => {
-      if (i === index) {
-        return { ...picture, file: undefined };
-      }
-      return picture;
-    });
-    setValue('pictures', newPictures);
-    console.log('newPictures', newPictures);
-  };
-
-  const handleClickUpload = (index: number) => {
-    if (fileInputRefs.current[index]) {
-      fileInputRefs.current[index].click();
-    }
-  };
+  useEffect(() => {
+    initializePictures();
+  }, []);
 
   const onSubmitHandler = (data: EstablishmentProfileFormValues) => {
     onSubmit(data);
@@ -171,12 +72,12 @@ export default function EstablishmentProfileForm({ onSubmit, isLoading }: Props)
             </p>
 
             <div className="grid grid-cols-3 gap-4">
-              {sortPicturesByPosition(watch('pictures') || []).map(picture => (
+              {(watch('pictures') || []).map(picture => (
                 <div
                   key={picture.position}
                   className="relative aspect-square border rounded-md overflow-hidden"
                 >
-                  {findPictureByPosition(watch('pictures') || [], picture.position)?.file ? (
+                  {picture.file ? (
                     <>
                       <div className="w-full h-full">
                         <Image

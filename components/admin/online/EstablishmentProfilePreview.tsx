@@ -1,28 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import {
-  Clock,
-  MapPin,
-  Phone,
-  Star,
-  Truck,
-  Globe,
-  Instagram,
-  Facebook,
-  Image as ImageIcon,
-} from 'lucide-react';
-import Image from 'next/image';
+import { MapPin, Phone, Star, Truck, Globe } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 import { EstablishmentProfileFormValues } from '@/schemas/establishment.schema';
-import useEmblaCarousel from 'embla-carousel-react';
 import { EstablishmentResponseDto } from '@/types/api';
-import {
-  getFileUrlFromFileOrUrl,
-  findPictureByPosition,
-  sortPicturesByPosition,
-} from '@/utils/file';
+import { getFileUrlFromFileOrUrl } from '@/utils/file';
+import { ImageCarousel } from '@/components/image-carousel';
+import { useEstablishmentHours } from '@/hooks/useEstablishmentHours';
+import { certificationLabels } from '@/hooks/useEstablishmentCertifications';
+import { SocialMediaLinks } from './SocialMediaLinks';
+import { OpeningStatus } from './OpeningStatus';
 
 interface EstablishmentProfilePreviewProps {
   address?: string;
@@ -33,99 +22,16 @@ export default function EstablishmentProfilePreview({
   address,
   establishment,
 }: EstablishmentProfilePreviewProps) {
-  // Initialize Embla Carousel with proper options
-  const [emblaRef, emblaApi] = useEmblaCarousel();
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const form = useFormContext<EstablishmentProfileFormValues>();
+  const { watch } = form;
+  const { formatOpeningHours } = useEstablishmentHours(form);
 
-  // Use form context to access form values directly
-  const { watch } = useFormContext<EstablishmentProfileFormValues>();
-
-  // Observer toutes les valeurs du formulaire
+  const openingStatus = formatOpeningHours();
   const formValues = watch();
   const pictures = watch('pictures') || [];
 
-  const {
-    primary_color,
-    name,
-    description,
-    price_range,
-    certifications,
-    social_media_links,
-    opening_days,
-  } = formValues;
-
-  // Set up Embla Carousel event listeners
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    const onSelect = () => {
-      setCurrentSlide(emblaApi.selectedScrollSnap());
-    };
-
-    emblaApi.on('select', onSelect);
-
-    // Initial call to set the current slide
-    onSelect();
-
-    return () => {
-      emblaApi.off('select', onSelect);
-    };
-  }, [emblaApi]);
-
-  // Helper function to display opening status text
-  const formatOpeningHours = () => {
-    const closedToday = {
-      isCurrentlyOpen: false,
-      message: 'Fechado hoje',
-    };
-    if (!opening_days) return closedToday;
-
-    const today = new Date().getDay();
-    const todayInfo = opening_days.find(day => day.day === today);
-
-    if (!todayInfo || !todayInfo.is_open) return closedToday;
-
-    const now = new Date();
-    const currentHour = now.getHours();
-    const currentMinutes = now.getMinutes();
-    const currentTimeString = `${currentHour.toString().padStart(2, '0')}:${currentMinutes.toString().padStart(2, '0')}`;
-
-    let nextOpeningTime = '';
-
-    for (const hours of todayInfo.opening_hours) {
-      if (currentTimeString >= hours.start_time && currentTimeString <= hours.end_time) {
-        return {
-          isCurrentlyOpen: true,
-          message: 'Aberto agora',
-        };
-      }
-
-      if (currentTimeString < hours.start_time) {
-        nextOpeningTime = hours.start_time;
-        break;
-      }
-    }
-
-    if (nextOpeningTime) {
-      return {
-        isCurrentlyOpen: false,
-        message: `Fechado : abre às ${nextOpeningTime}`,
-      };
-    } else {
-      return closedToday;
-    }
-  };
-
-  // Dictionary for certification labels in Portuguese
-  const certificationLabels: Record<string, string> = {
-    vegetarian: 'Vegetariano',
-    vegan: 'Vegano',
-    gluten_free: 'Sem Glúten',
-    lactose_free: 'Sem Lactose',
-    kosher: 'Kosher',
-    halal: 'Halal',
-    bio: 'Bio/Orgânico',
-  };
+  const { primary_color, name, description, price_range, certifications, social_media_links } =
+    formValues;
 
   return (
     <div
@@ -156,49 +62,7 @@ export default function EstablishmentProfilePreview({
       </div>
 
       {/* Image Carousel */}
-      <div className="w-full relative">
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex h-48">
-            {sortPicturesByPosition(pictures).map((picture, index) => (
-              <div
-                key={picture.position}
-                className="flex-[0_0_100%] flex justify-center items-center min-w-0 relative h-48"
-              >
-                {findPictureByPosition(pictures, picture.position)?.file ? (
-                  <div className="relative h-full w-[90%]">
-                    <Image
-                      src={getFileUrlFromFileOrUrl(picture.file)}
-                      alt={`Establishment photo ${picture.position + 1}`}
-                      fill
-                      priority={picture.position === 0}
-                      className="object-cover rounded-lg"
-                    />
-                  </div>
-                ) : (
-                  <div className="h-full w-[90%] object-cover rounded-lg border-dashed border-2 border-gray-300 flex items-center justify-center">
-                    <ImageIcon className="text-gray-400" size={78} />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Custom Carousel indicators */}
-        <div className="flex w-full justify-center gap-3 mt-2">
-          {[1, 2, 3].map((_, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={() => emblaApi?.scrollTo(index)}
-              className={`w-2 h-2 rounded-full border transition-colors ${
-                currentSlide === index ? 'bg-black' : 'bg-white/50'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      </div>
+      <ImageCarousel images={pictures} getImageUrl={getFileUrlFromFileOrUrl} height="12rem" />
 
       {/* Restaurant Info */}
       <div className="p-4">
@@ -220,19 +84,7 @@ export default function EstablishmentProfilePreview({
         <p className="text-sm text-gray-600 mb-3">{description || 'Comida de rua vietnamita'}</p>
 
         {/* Status */}
-        <div
-          className="py-2 px-3 rounded-md flex items-center justify-between"
-          style={{
-            backgroundColor: formatOpeningHours().isCurrentlyOpen ? '#5bb053' : '#888888',
-            color: 'white',
-          }}
-        >
-          <div className="flex items-center">
-            <Clock className="w-4 h-4 mr-2" />
-            <span>{formatOpeningHours().message}</span>
-          </div>
-          <div className="transform rotate-90">›</div>
-        </div>
+        <OpeningStatus isOpen={openingStatus.isCurrentlyOpen} message={openingStatus.message} />
       </div>
 
       {/* Links */}
@@ -294,46 +146,13 @@ export default function EstablishmentProfilePreview({
 
       {/* Social Media Links */}
       {social_media_links && (
-        <div className="p-4 flex gap-3 border-b ">
-          {social_media_links.facebook && (
-            <a
-              href={social_media_links.facebook}
-              target="_blank"
-              className="w-11 h-11 rounded-full flex items-center justify-center bg-blue-600 text-white"
-            >
-              <Facebook size={28} />
-            </a>
-          )}
-
-          {social_media_links.instagram && (
-            <a
-              href={social_media_links.instagram}
-              target="_blank"
-              className="w-11 h-11 rounded-full flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500 text-white"
-            >
-              <Instagram size={28} />
-            </a>
-          )}
-
-          {social_media_links.tiktok && (
-            <a
-              href={social_media_links.tiktok}
-              target="_blank"
-              className="w-11 h-11 rounded-full flex items-center justify-center bg-black text-white"
-            >
-              <span className="text-xs">TikTok</span>
-            </a>
-          )}
-
-          {social_media_links.website && (
-            <a
-              href={social_media_links.website}
-              target="_blank"
-              className="w-11 h-11 rounded-full flex items-center justify-center bg-green-600 text-white"
-            >
-              <Globe size={28} />
-            </a>
-          )}
+        <div className="p-4 border-b">
+          <SocialMediaLinks
+            facebook={social_media_links.facebook}
+            instagram={social_media_links.instagram}
+            tiktok={social_media_links.tiktok}
+            website={social_media_links.website}
+          />
         </div>
       )}
 
