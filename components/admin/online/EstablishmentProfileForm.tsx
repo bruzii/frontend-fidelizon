@@ -8,11 +8,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { CheckCircle2, Clock, Facebook, Globe, Image, Instagram, Loader2 } from 'lucide-react';
+import {
+  CheckCircle2,
+  Clock,
+  Facebook,
+  Globe,
+  Image as ImageIcon,
+  Instagram,
+  Loader2,
+} from 'lucide-react';
+import Image from 'next/image';
 import { UpdateEstablishmentProfileDto } from '@/types/api/types.gen';
 import { certificationEnum, EstablishmentProfileFormValues } from '@/schemas/establishment.schema';
 import { Input } from '@/components/ui/input';
 import { PhoneInputField } from '@/components/forms/phone-input-field';
+import { getFileUrlFromFileOrUrl, isFile } from '@/utils/utils';
 
 const daysOfWeek = [
   { value: 0, label: 'Domingo' },
@@ -152,9 +162,10 @@ export default function EstablishmentProfileForm({ onSubmit, isLoading }: Props)
                   {watch(`pictures.${index}.file`) ? (
                     <>
                       <div className="w-full h-full">
-                        <img
-                          src={URL.createObjectURL(watch(`pictures.${index}.file`) as File)}
+                        <Image
+                          src={getFileUrlFromFileOrUrl(watch(`pictures.${index}.file`))}
                           alt={`Preview ${index + 1}`}
+                          fill
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -171,7 +182,7 @@ export default function EstablishmentProfileForm({ onSubmit, isLoading }: Props)
                       className="aspect-square border-2 border-dashed rounded-md flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50"
                       onClick={() => handleClickUpload(index)}
                     >
-                      <Image className="h-8 w-8 text-gray-400 mb-2" />
+                      <ImageIcon className="h-8 w-8 text-gray-400 mb-2" />
                       <span className="text-sm text-gray-500">Adicionar foto</span>
                     </div>
                   )}

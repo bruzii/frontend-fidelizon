@@ -2,11 +2,23 @@
 
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Clock, MapPin, Phone, Star, Truck, Globe, Instagram, Facebook, Image } from 'lucide-react';
+import {
+  Clock,
+  MapPin,
+  Phone,
+  Star,
+  Truck,
+  Globe,
+  Instagram,
+  Facebook,
+  Image as ImageIcon,
+} from 'lucide-react';
+import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import { EstablishmentProfileFormValues } from '@/schemas/establishment.schema';
 import useEmblaCarousel from 'embla-carousel-react';
 import { EstablishmentResponseDto } from '@/types/api';
+import { getFileUrlFromFileOrUrl } from '@/utils/utils';
 
 interface EstablishmentProfilePreviewProps {
   address?: string;
@@ -148,21 +160,19 @@ export default function EstablishmentProfilePreview({
                 key={index}
                 className="flex-[0_0_100%] flex justify-center items-center min-w-0 relative h-48"
               >
-                {establishment?.pictures[index]?.signedUrl ||
-                pictures[index]?.file instanceof File ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={
-                      pictures[index]?.file instanceof File
-                        ? URL.createObjectURL(pictures[index]?.file as File)
-                        : establishment?.pictures[index]?.signedUrl
-                    }
-                    alt={`Establishment photo ${index + 1}`}
-                    className="h-full w-[90%] object-cover rounded-lg"
-                  />
+                {getFileUrlFromFileOrUrl(pictures[index]?.file) ? (
+                  <div className="relative h-full w-[90%]">
+                    <Image
+                      src={getFileUrlFromFileOrUrl(pictures[index]?.file)}
+                      alt={`Establishment photo ${index + 1}`}
+                      fill
+                      priority={index === 0}
+                      className="object-cover rounded-lg"
+                    />
+                  </div>
                 ) : (
                   <div className="h-full w-[90%] object-cover rounded-lg border-dashed border-2 border-gray-300 flex items-center justify-center">
-                    <Image className="text-gray-400" size={78} />
+                    <ImageIcon className="text-gray-400" size={78} />
                   </div>
                 )}
               </div>

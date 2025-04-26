@@ -51,6 +51,10 @@ export default function OnlineProfilePage() {
         opening_days: selectedEstablishment.opening_days || [],
         social_media_links: selectedEstablishment.social_media_links,
         delivery_links: selectedEstablishment.delivery_links,
+        pictures: selectedEstablishment.pictures.map(picture => ({
+          position: picture.position,
+          file: picture.signedUrl,
+        })),
       });
     }
   }, [selectedEstablishment, methods]);
