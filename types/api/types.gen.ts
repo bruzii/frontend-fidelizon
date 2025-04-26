@@ -329,7 +329,7 @@ export type UpdateEstablishmentProfileDto = {
 };
 
 export type PicturesDto = {
-  pictures?: Array<Blob | File> | null;
+  picture?: (Blob | File) | null;
 };
 
 export type AuthControllerLoginData = {
@@ -498,14 +498,20 @@ export type EstablishmentControllerUploadEstablishmentProfilePicturesData = {
   body: PicturesDto;
   path: {
     id: string;
+    position: number;
   };
   query?: never;
-  url: '/establishments/{id}/pictures';
+  url: '/establishments/{id}/pictures/{position}';
 };
 
 export type EstablishmentControllerUploadEstablishmentProfilePicturesResponses = {
-  201: unknown;
+  201: {
+    [key: string]: unknown;
+  };
 };
+
+export type EstablishmentControllerUploadEstablishmentProfilePicturesResponse =
+  EstablishmentControllerUploadEstablishmentProfilePicturesResponses[keyof EstablishmentControllerUploadEstablishmentProfilePicturesResponses];
 
 export type ClientOptions = {
   baseUrl: 'http://localhost:3000' | (string & {});

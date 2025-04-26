@@ -8,6 +8,7 @@ import {
 } from '@/types/api/sdk.gen';
 import axios from 'axios';
 import tokenManager from '@/utils/tokenManager';
+import { EstablishmentProfileFormValues } from '@/schemas/establishment.schema';
 
 interface UseEstablishmentProfileOptions {
   onSuccess?: () => void;
@@ -20,24 +21,34 @@ export const useEstablishmentProfile = (options?: UseEstablishmentProfileOptions
 
   const updateEstablishmentProfile = async (
     establishmentId: string,
-    profile: UpdateEstablishmentProfileDto,
-    pictures?: File[]
+    profile: EstablishmentProfileFormValues
   ) => {
     if (!clientApi) return;
-    console.log('profile', profile);
+    const { pictures, ...profileData } = profile;
+
     setIsLoading(true);
 
+    // Filter out pictures that are already uploaded
+    // picture with file as undefined will be deleted
+    // picture with file as string will be uploaded
+    const picturesToUpload = pictures?.filter(picture => typeof picture.file !== 'string');
+
     try {
-      if (pictures) {
-        await establishmentControllerUploadEstablishmentProfilePictures({
-          client: clientApi,
-          path: {
-            id: establishmentId,
-          },
-          body: {
-            pictures,
-          },
-        });
+      if (picturesToUpload) {
+        await Promise.all(
+          picturesToUpload.map(picture =>
+            establishmentControllerUploadEstablishmentProfilePictures({
+              client: clientApi,
+              path: {
+                id: establishmentId,
+                position: picture.position,
+              },
+              body: {
+                picture: picture.file,
+              },
+            })
+          )
+        );
       }
 
       await establishmentControllerUpdateEstablishmentProfile({
@@ -45,8 +56,9 @@ export const useEstablishmentProfile = (options?: UseEstablishmentProfileOptions
         path: {
           id: establishmentId,
         },
-        body: profile,
+        body: profileData,
       });
+
       if (options?.onSuccess) {
         options.onSuccess();
       }

@@ -1,21 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Configuration pour accepter les sous-domaines en mode développement
-  assetPrefix:'',
+  assetPrefix: '',
+  images: {
+    domains: ['fidelizon-plateform-dev.s3.eu-north-1.amazonaws.com'],
+  },
   async headers() {
     return [
       {
         source: '/_next/:path*',
-        headers: [
-          { key: 'Access-Control-Allow-Origin', value: '*' }
-        ],
+        headers: [{ key: 'Access-Control-Allow-Origin', value: '*' }],
       },
     ];
   },
-  
+
   crossOrigin: 'anonymous',
   allowedDevOrigins: ['admin.localhost', 'client.localhost'],
-  
+
   // Configuration des réécritures pour inclure les ressources statiques
   // async rewrites() {
   //   return {

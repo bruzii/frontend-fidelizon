@@ -18,7 +18,11 @@ import { useFormContext } from 'react-hook-form';
 import { EstablishmentProfileFormValues } from '@/schemas/establishment.schema';
 import useEmblaCarousel from 'embla-carousel-react';
 import { EstablishmentResponseDto } from '@/types/api';
-import { getFileUrlFromFileOrUrl } from '@/utils/utils';
+import {
+  getFileUrlFromFileOrUrl,
+  findPictureByPosition,
+  sortPicturesByPosition,
+} from '@/utils/file';
 
 interface EstablishmentProfilePreviewProps {
   address?: string;
@@ -155,18 +159,18 @@ export default function EstablishmentProfilePreview({
       <div className="w-full relative">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex h-48">
-            {[1, 2, 3].map((photo, index) => (
+            {sortPicturesByPosition(pictures).map((picture, index) => (
               <div
-                key={index}
+                key={picture.position}
                 className="flex-[0_0_100%] flex justify-center items-center min-w-0 relative h-48"
               >
-                {getFileUrlFromFileOrUrl(pictures[index]?.file) ? (
+                {findPictureByPosition(pictures, picture.position)?.file ? (
                   <div className="relative h-full w-[90%]">
                     <Image
-                      src={getFileUrlFromFileOrUrl(pictures[index]?.file)}
-                      alt={`Establishment photo ${index + 1}`}
+                      src={getFileUrlFromFileOrUrl(picture.file)}
+                      alt={`Establishment photo ${picture.position + 1}`}
                       fill
-                      priority={index === 0}
+                      priority={picture.position === 0}
                       className="object-cover rounded-lg"
                     />
                   </div>

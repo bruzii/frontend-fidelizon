@@ -22,7 +22,11 @@ import { UpdateEstablishmentProfileDto } from '@/types/api/types.gen';
 import { certificationEnum, EstablishmentProfileFormValues } from '@/schemas/establishment.schema';
 import { Input } from '@/components/ui/input';
 import { PhoneInputField } from '@/components/forms/phone-input-field';
-import { getFileUrlFromFileOrUrl, isFile } from '@/utils/utils';
+import {
+  findPictureByPosition,
+  getFileUrlFromFileOrUrl,
+  sortPicturesByPosition,
+} from '@/utils/file';
 
 const daysOfWeek = [
   { value: 0, label: 'Domingo' },
@@ -35,7 +39,7 @@ const daysOfWeek = [
 ];
 
 type Props = {
-  onSubmit: (data: UpdateEstablishmentProfileDto, pictures?: File[]) => void;
+  onSubmit: (data: EstablishmentProfileFormValues) => void;
   isLoading: boolean;
 };
 
@@ -52,7 +56,7 @@ export default function EstablishmentProfileForm({ onSubmit, isLoading }: Props)
   } = useFormContext<EstablishmentProfileFormValues>();
 
   const formValues = watch();
-
+  console.log({ formValues });
   // Initialize picture slots if they don't exist
   React.useEffect(() => {
     // Initialize picture positions if not already set
@@ -113,13 +117,30 @@ export default function EstablishmentProfileForm({ onSubmit, isLoading }: Props)
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Set the file in the form
-    setValue(`pictures.${index}.file`, file);
-    setValue(`pictures.${index}.position`, index);
+    console.log(watch('pictures'));
+    const pictures = [...(watch('pictures') || [])];
+    const newPictures = pictures.map((picture, i) => {
+      if (i === index) {
+        return { ...picture, file };
+      }
+      return picture;
+    });
+    setValue('pictures', newPictures);
   };
 
   const removePicture = (index: number) => {
-    setValue(`pictures.${index}.file`, undefined);
+    console.log('removePictureIndex', index);
+    console.log('watch(pictures)', watch('pictures'));
+    // remove the picture using the index and the position
+    const pictures = [...(watch('pictures') || [])];
+    const newPictures = pictures.map((picture, i) => {
+      if (i === index) {
+        return { ...picture, file: undefined };
+      }
+      return picture;
+    });
+    setValue('pictures', newPictures);
+    console.log('newPictures', newPictures);
   };
 
   const handleClickUpload = (index: number) => {
@@ -129,11 +150,7 @@ export default function EstablishmentProfileForm({ onSubmit, isLoading }: Props)
   };
 
   const onSubmitHandler = (data: EstablishmentProfileFormValues) => {
-    const { pictures, ...rest } = data;
-    onSubmit(
-      rest,
-      pictures?.map(picture => picture.file)
-    );
+    onSubmit(data);
   };
 
   return (
@@ -154,25 +171,26 @@ export default function EstablishmentProfileForm({ onSubmit, isLoading }: Props)
             </p>
 
             <div className="grid grid-cols-3 gap-4">
-              {[0, 1, 2].map(index => (
+              {sortPicturesByPosition(watch('pictures') || []).map(picture => (
                 <div
-                  key={index}
+                  key={picture.position}
                   className="relative aspect-square border rounded-md overflow-hidden"
                 >
-                  {watch(`pictures.${index}.file`) ? (
+                  {findPictureByPosition(watch('pictures') || [], picture.position)?.file ? (
                     <>
                       <div className="w-full h-full">
                         <Image
-                          src={getFileUrlFromFileOrUrl(watch(`pictures.${index}.file`))}
-                          alt={`Preview ${index + 1}`}
-                          fill
+                          src={getFileUrlFromFileOrUrl(picture.file)}
+                          alt={`Preview ${picture.position + 1}`}
+                          width={100}
+                          height={100}
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <button
                         type="button"
                         className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                        onClick={() => removePicture(index)}
+                        onClick={() => removePicture(picture.position)}
                       >
                         ×
                       </button>
@@ -180,7 +198,7 @@ export default function EstablishmentProfileForm({ onSubmit, isLoading }: Props)
                   ) : (
                     <div
                       className="aspect-square border-2 border-dashed rounded-md flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50"
-                      onClick={() => handleClickUpload(index)}
+                      onClick={() => handleClickUpload(picture.position)}
                     >
                       <ImageIcon className="h-8 w-8 text-gray-400 mb-2" />
                       <span className="text-sm text-gray-500">Adicionar foto</span>
@@ -189,11 +207,11 @@ export default function EstablishmentProfileForm({ onSubmit, isLoading }: Props)
                   <input
                     type="file"
                     ref={el => {
-                      if (el) fileInputRefs.current[index] = el;
+                      if (el) fileInputRefs.current[picture.position] = el;
                     }}
                     className="hidden"
                     accept="image/jpeg,image/png,image/webp"
-                    onChange={e => handleFileChange(index, e)}
+                    onChange={e => handleFileChange(picture.position, e)}
                   />
                 </div>
               ))}

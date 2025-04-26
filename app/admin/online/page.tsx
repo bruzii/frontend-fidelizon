@@ -51,17 +51,21 @@ export default function OnlineProfilePage() {
         opening_days: selectedEstablishment.opening_days || [],
         social_media_links: selectedEstablishment.social_media_links,
         delivery_links: selectedEstablishment.delivery_links,
-        pictures: selectedEstablishment.pictures.map(picture => ({
-          position: picture.position,
-          file: picture.signedUrl,
-        })),
+        pictures: Array.from({ length: 3 }, (_, i) => {
+          const existingPicture = selectedEstablishment.pictures.find(p => p.position === i);
+          return {
+            position: i,
+            file: existingPicture ? existingPicture.signedUrl : undefined,
+          };
+        }),
       });
     }
   }, [selectedEstablishment, methods]);
 
-  const handleSubmit = async (data: UpdateEstablishmentProfileDto, pictures?: File[]) => {
+  const handleSubmit = async (data: EstablishmentProfileFormValues) => {
     if (!selectedEstablishment) return;
-    await updateEstablishmentProfile(selectedEstablishment.id, data, pictures);
+    console.log('pictures', data.pictures);
+    await updateEstablishmentProfile(selectedEstablishment.id, data);
   };
 
   if ((isLoadingEstablishment || !selectedEstablishment) && showEditor) {

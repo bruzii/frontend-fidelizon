@@ -39,6 +39,7 @@ export const establishmentProfilePicturesSchema = z.object({
   position: z.number(),
   file: z.any().optional(),
 });
+export type EstablishmentProfilePicturesSchema = z.infer<typeof establishmentProfilePicturesSchema>;
 
 export const establishmentProfileSchema = z.object({
   name: z.string().min(1),
@@ -51,7 +52,7 @@ export const establishmentProfileSchema = z.object({
   opening_days: z.array(openingDaysSchema).optional(),
   social_media_links: socialMediaLinksSchema.optional().nullable(),
   delivery_links: deliveryLinksSchema.optional().nullable(),
-  pictures: z.array(establishmentProfilePicturesSchema).optional(),
+  pictures: z.array(establishmentProfilePicturesSchema).optional().nullable(),
 });
 
 export type EstablishmentProfileFormValues = z.infer<typeof establishmentProfileSchema>;
