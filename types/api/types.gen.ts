@@ -198,6 +198,12 @@ export type CreateEstablishmentDto = {
   neighborhood?: string;
   city: string;
   cep: string;
+  logo_s3_key?: string;
+  primary_color?: string;
+  description?: string;
+  price_range?: string;
+  phone_number?: string;
+  phone_country_code?: string;
 };
 
 export type OnboardingPartnerDto = {
@@ -244,8 +250,53 @@ export type AutocompleteResponseDto = {
   predictions: Array<PredictionDto>;
 };
 
+export type EstablishmentOpeningHoursDto = {
+  start_time: string;
+  end_time: string;
+};
+
+export type EstablishmentOpeningDaysDto = {
+  day: number;
+  is_open: boolean;
+  opening_hours: Array<EstablishmentOpeningHoursDto>;
+};
+
+export type EstablishmentMediaSocialLinksDto = {
+  facebook?: string | null;
+  instagram?: string | null;
+  tiktok?: string | null;
+  website?: string | null;
+};
+
+export type EstablishmentDeliveryLinksDto = {
+  ifood?: string | null;
+  uber_eats?: string | null;
+  rappi?: string | null;
+};
+
+export type EstablishmentPictureResponseDto = {
+  /**
+   * The position of the picture
+   */
+  position: number;
+  /**
+   * The signed url of the picture
+   */
+  signedUrl: string;
+};
+
 export type EstablishmentResponseDto = {
   location?: PointDto;
+  opening_days?: Array<EstablishmentOpeningDaysDto>;
+  social_media_links?: EstablishmentMediaSocialLinksDto | null;
+  delivery_links?: EstablishmentDeliveryLinksDto | null;
+  certifications?: Array<
+    'kosher' | 'halal' | 'vegetarian' | 'vegan' | 'lactose_free' | 'gluten_free' | 'bio'
+  >;
+  /**
+   * The pictures of the establishment
+   */
+  pictures: Array<EstablishmentPictureResponseDto>;
   id: string;
   name: string;
   public_establishment_id: string;
@@ -254,6 +305,31 @@ export type EstablishmentResponseDto = {
   neighborhood?: string;
   city: string;
   cep: string;
+  logo_s3_key?: string;
+  primary_color?: string;
+  description?: string;
+  price_range?: string;
+  phone_number?: string;
+  phone_country_code?: string;
+};
+
+export type UpdateEstablishmentProfileDto = {
+  opening_days?: Array<EstablishmentOpeningDaysDto>;
+  social_media_links?: EstablishmentMediaSocialLinksDto | null;
+  delivery_links?: EstablishmentDeliveryLinksDto | null;
+  certifications?: Array<
+    'kosher' | 'halal' | 'vegetarian' | 'vegan' | 'lactose_free' | 'gluten_free' | 'bio'
+  >;
+  description?: string;
+  price_range?: string;
+  phone_number?: string;
+  phone_country_code?: string;
+  name?: string;
+  primary_color?: string;
+};
+
+export type PicturesDto = {
+  pictures?: Array<Blob | File> | null;
 };
 
 export type AuthControllerLoginData = {
@@ -398,6 +474,38 @@ export type EstablishmentControllerGetEstablishmentsResponses = {
 
 export type EstablishmentControllerGetEstablishmentsResponse =
   EstablishmentControllerGetEstablishmentsResponses[keyof EstablishmentControllerGetEstablishmentsResponses];
+
+export type EstablishmentControllerUpdateEstablishmentProfileData = {
+  body: UpdateEstablishmentProfileDto;
+  path: {
+    id: string;
+  };
+  query?: never;
+  url: '/establishments/{id}/profile';
+};
+
+export type EstablishmentControllerUpdateEstablishmentProfileResponses = {
+  /**
+   * The establishment profile has been successfully updated.
+   */
+  200: EstablishmentResponseDto;
+};
+
+export type EstablishmentControllerUpdateEstablishmentProfileResponse =
+  EstablishmentControllerUpdateEstablishmentProfileResponses[keyof EstablishmentControllerUpdateEstablishmentProfileResponses];
+
+export type EstablishmentControllerUploadEstablishmentProfilePicturesData = {
+  body: PicturesDto;
+  path: {
+    id: string;
+  };
+  query?: never;
+  url: '/establishments/{id}/pictures';
+};
+
+export type EstablishmentControllerUploadEstablishmentProfilePicturesResponses = {
+  201: unknown;
+};
 
 export type ClientOptions = {
   baseUrl: 'http://localhost:3000' | (string & {});

@@ -177,13 +177,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ className }) => {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const {
-    establishments,
-    selectedEstablishment,
-    selectedEstablishmentId,
-    isLoading,
-    setSelectedEstablishment,
-  } = useEstablishments();
+  const { establishments, selectedEstablishment, isLoading, setSelectedEstablishment } =
+    useEstablishments();
 
   // Navigation items organisés par section
   const navSections: NavSection[] = [

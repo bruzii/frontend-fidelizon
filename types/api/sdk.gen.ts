@@ -21,6 +21,9 @@ import type {
   PartnerControllerAutocompleteResponse,
   EstablishmentControllerGetEstablishmentsData,
   EstablishmentControllerGetEstablishmentsResponse,
+  EstablishmentControllerUpdateEstablishmentProfileData,
+  EstablishmentControllerUpdateEstablishmentProfileResponse,
+  EstablishmentControllerUploadEstablishmentProfilePicturesData,
 } from './types.gen';
 import { client as _heyApiClient } from './client.gen';
 
@@ -165,5 +168,46 @@ export const establishmentControllerGetEstablishments = <ThrowOnError extends bo
   >({
     url: '/establishments',
     ...options,
+  });
+};
+
+/**
+ * Update establishment profile
+ */
+export const establishmentControllerUpdateEstablishmentProfile = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<EstablishmentControllerUpdateEstablishmentProfileData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).put<
+    EstablishmentControllerUpdateEstablishmentProfileResponse,
+    unknown,
+    ThrowOnError
+  >({
+    url: '/establishments/{id}/profile',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    },
+  });
+};
+
+/**
+ * Upload establishment profile pictures
+ */
+export const establishmentControllerUploadEstablishmentProfilePictures = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<EstablishmentControllerUploadEstablishmentProfilePicturesData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).post<unknown, unknown, ThrowOnError>({
+    ...formDataBodySerializer,
+    url: '/establishments/{id}/pictures',
+    ...options,
+    headers: {
+      'Content-Type': null,
+      ...options?.headers,
+    },
   });
 };

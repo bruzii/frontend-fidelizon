@@ -11,6 +11,8 @@ export interface FormTextFieldProps {
   type?: string;
   required?: boolean;
   disabled?: boolean;
+  placeholder?: string;
+  maxLength?: number;
 }
 
 export const FormTextField: React.FC<FormTextFieldProps> = ({
@@ -19,6 +21,8 @@ export const FormTextField: React.FC<FormTextFieldProps> = ({
   type = 'text',
   required = false,
   disabled = false,
+  placeholder = '',
+  maxLength,
 }) => {
   const {
     control,
@@ -36,16 +40,26 @@ export const FormTextField: React.FC<FormTextFieldProps> = ({
             {required && '*'}
           </FormLabel>
           <FormControl>
-            <Input
-              type={type}
-              {...field}
-              className={cn(
-                'border rounded-md',
-                errors[name] ? 'border-destructive' : 'border-input',
-                disabled ? 'opacity-50 cursor-not-allowed' : ''
+            <div className="relative">
+              <Input
+                type={type}
+                {...field}
+                className={cn(
+                  'border rounded-md',
+                  errors[name] ? 'border-destructive' : 'border-input',
+                  disabled ? 'opacity-50 cursor-not-allowed' : '',
+                  maxLength && 'py-5'
+                )}
+                disabled={disabled}
+                placeholder={placeholder}
+                maxLength={maxLength}
+              />
+              {maxLength && (
+                <p className="text-sm absolute right-1 bottom-1 text-gray-500 w-16 text-center">
+                  {field.value.length} / {maxLength}
+                </p>
               )}
-              disabled={disabled}
-            />
+            </div>
           </FormControl>
           <FormMessage />
         </FormItem>

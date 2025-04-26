@@ -1,6 +1,6 @@
 // components/admin/register/EstablishmentStep.tsx
-import React, { useState, useEffect, useRef } from 'react';
-import { useFormContext, useFieldArray, FieldErrors } from 'react-hook-form';
+import React, { useState, useEffect } from 'react';
+import { useFormContext, useFieldArray } from 'react-hook-form';
 import {
   Info,
   Search,
@@ -23,7 +23,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-
+import { FormLabel } from '@/components/ui/form';
 import { cn } from '@/lib/utils';
 import { partnerControllerAutocomplete } from '@/types/api';
 import { FormTextField } from '@/components/forms/form-text-field';
@@ -250,12 +250,9 @@ const EstablishmentStep: React.FC = () => {
 
               <CardContent className="space-y-6">
                 <div>
-                  <label
-                    htmlFor={`establishments.${index}.name`}
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
+                  <FormLabel htmlFor={`establishments.${index}.name`}>
                     Nome do ponto de venda*
-                  </label>
+                  </FormLabel>
                   <div className="relative">
                     <Input
                       id={`establishments.${index}.name`}
@@ -289,9 +286,7 @@ const EstablishmentStep: React.FC = () => {
                         }
                       }}
                       onBlur={e => {
-                        // Délai pour permettre de cliquer sur un résultat avant de fermer
                         setTimeout(() => {
-                          // Vérifier si le focus est sur un élément de résultat
                           const relatedTarget = e.relatedTarget as HTMLElement;
                           const isResult = relatedTarget?.classList.contains('result-item');
 

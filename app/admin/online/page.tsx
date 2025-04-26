@@ -1,10 +1,141 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import EstablishmentProfileForm from '@/components/admin/online/EstablishmentProfileForm';
+import EstablishmentProfilePreview from '@/components/admin/online/EstablishmentProfilePreview';
+import { toast } from 'sonner';
+import { useForm, FormProvider } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEstablishments } from '@/hooks/useEstablishments';
+import { useEstablishmentProfile } from '@/hooks/useEstablishmentProfile';
+import {
+  establishmentProfileSchema,
+  EstablishmentProfileFormValues,
+} from '@/schemas/establishment.schema';
+import { UpdateEstablishmentProfileDto } from '@/types/api/types.gen';
+
 export default function OnlineProfilePage() {
+  const [showEditor, setShowEditor] = useState(false);
+
+  const { selectedEstablishment, isLoading: isLoadingEstablishment } = useEstablishments();
+  const { isLoading: isUpdatingProfile, updateEstablishmentProfile } = useEstablishmentProfile({
+    onSuccess: () => {
+      toast.success('Perfil atualizado', {
+        description: 'O perfil do estabelecimento foi atualizado com sucesso.',
+      });
+      setShowEditor(false);
+    },
+    onError: error => {
+      console.error('Error updating establishment profile:', error);
+      toast.error('Erro', {
+        description: 'Ocorreu um erro ao atualizar o perfil.',
+      });
+    },
+  });
+
+  const methods = useForm<EstablishmentProfileFormValues>({
+    resolver: zodResolver(establishmentProfileSchema),
+  });
+
+  useEffect(() => {
+    console.log('selectedEstablishment', selectedEstablishment);
+    if (selectedEstablishment) {
+      methods.reset({
+        name: selectedEstablishment.name || '',
+        description: selectedEstablishment.description || '',
+        primary_color: selectedEstablishment.primary_color || '#e67e22',
+        price_range: selectedEstablishment.price_range || '',
+        phone_country_code: selectedEstablishment.phone_country_code || '+33',
+        phone_number: selectedEstablishment.phone_number || '',
+        certifications: selectedEstablishment.certifications || [],
+        opening_days: selectedEstablishment.opening_days || [],
+        social_media_links: selectedEstablishment.social_media_links,
+        delivery_links: selectedEstablishment.delivery_links,
+      });
+    }
+  }, [selectedEstablishment, methods]);
+
+  const handleSubmit = async (data: UpdateEstablishmentProfileDto, pictures?: File[]) => {
+    if (!selectedEstablishment) return;
+    await updateEstablishmentProfile(selectedEstablishment.id, data, pictures);
+  };
+
+  if ((isLoadingEstablishment || !selectedEstablishment) && showEditor) {
+    return <div className="flex justify-center items-center h-96">Carregando...</div>;
+  }
+
+  if (showEditor && selectedEstablishment) {
+    return (
+      <FormProvider {...methods}>
+        <div className="py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center mb-8">
+              <h1 className="text-3xl font-bold text-gray-900">Editar Perfil Online</h1>
+              <button
+                onClick={() => setShowEditor(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+              >
+                Cancelar
+              </button>
+            </div>
+            <p className="mt-2 text-sm text-gray-500 mb-8">
+              Edite as informações do seu estabelecimento e veja uma prévia de como ficará o perfil
+              online.
+            </p>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="bg-white shadow rounded-lg p-6">
+                <h2 className="text-xl font-medium text-gray-900 mb-6">Informações do Perfil</h2>
+                <EstablishmentProfileForm onSubmit={handleSubmit} isLoading={isUpdatingProfile} />
+              </div>
+
+              <div className="bg-white shadow rounded-lg p-6">
+                <h2 className="text-xl font-medium text-gray-900 mb-6">Prévia do Perfil</h2>
+                <div className="flex justify-center">
+                  <div className="w-full max-w-[375px]">
+                    <EstablishmentProfilePreview
+                      address={selectedEstablishment.address}
+                      establishment={selectedEstablishment}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </FormProvider>
+    );
+  }
+
+  // Loading state
+  if (isLoadingEstablishment) {
+    return <div className="flex justify-center items-center h-96">Carregando...</div>;
+  }
+
+  // Error state if no establishment is selected
+  if (!selectedEstablishment) {
+    return (
+      <div className="py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Nenhum estabelecimento selecionado
+            </h2>
+            <p className="mt-2 text-sm text-gray-500">
+              Selecione um estabelecimento no menu lateral para gerenciar seu perfil online.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900">Profile Online</h1>
 
-        {/* Statistiques du profil en ligne */}
+        {/* Profile statistics */}
         <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
@@ -18,119 +149,107 @@ export default function OnlineProfilePage() {
             <div className="px-4 py-5 sm:p-6">
               <dl>
                 <dt className="text-sm font-medium text-gray-500 truncate">Réservations</dt>
-                <dd className="mt-1 text-3xl font-semibold text-gray-900">72</dd>
+                <dd className="mt-1 text-3xl font-semibold text-gray-900">24</dd>
               </dl>
             </div>
           </div>
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <dl>
-                <dt className="text-sm font-medium text-gray-500 truncate">Note moyenne</dt>
-                <dd className="mt-1 text-3xl font-semibold text-gray-900">4.7/5</dd>
+                <dt className="text-sm font-medium text-gray-500 truncate">Clics sur le menu</dt>
+                <dd className="mt-1 text-3xl font-semibold text-gray-900">358</dd>
               </dl>
             </div>
           </div>
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <dl>
-                <dt className="text-sm font-medium text-gray-500 truncate">Avis clients</dt>
-                <dd className="mt-1 text-3xl font-semibold text-gray-900">48</dd>
+                <dt className="text-sm font-medium text-gray-500 truncate">Complétion du profil</dt>
+                <dd className="mt-1 text-3xl font-semibold text-gray-900">75%</dd>
               </dl>
             </div>
           </div>
         </div>
 
-        {/* Informations du profil */}
-        <div className="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
-          <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-            <div>
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Informations de profil
-              </h3>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                Détails de présentation public.
-              </p>
-            </div>
-            <button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">
-              Modifier
+        {/* Preview and edit button */}
+        <div className="mt-10">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-medium text-gray-900">Aperçu de votre profil en ligne</h2>
+            <button
+              onClick={() => setShowEditor(true)}
+              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+            >
+              Éditer le profil
             </button>
           </div>
-          <div className="border-t border-gray-200">
-            <dl>
-              <div className="bg-gray-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Nom de l&apos;établissement</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  Restaurant Saveurs
-                </dd>
-              </div>
-              <div className="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Description</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  Restaurant gastronomique proposant une cuisine traditionnelle avec des produits
-                  locaux et de saison.
-                </dd>
-              </div>
-              <div className="bg-gray-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Adresse</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  23 rue de la Gastronomie, 75001 Paris
-                </dd>
-              </div>
-              <div className="bg-white px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Horaires d&apos;ouverture</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
-                    <li className="pl-3 pr-4 py-2 flex items-center justify-between text-sm">
-                      <div className="w-0 flex-1 flex items-center">
-                        <span className="ml-2 flex-1 w-0 truncate">
-                          Lundi - Vendredi: 12h00 - 14h30, 19h00 - 22h30
-                        </span>
-                      </div>
-                    </li>
-                    <li className="pl-3 pr-4 py-2 flex items-center justify-between text-sm">
-                      <div className="w-0 flex-1 flex items-center">
-                        <span className="ml-2 flex-1 w-0 truncate">Samedi: 19h00 - 23h00</span>
-                      </div>
-                    </li>
-                    <li className="pl-3 pr-4 py-2 flex items-center justify-between text-sm">
-                      <div className="w-0 flex-1 flex items-center">
-                        <span className="ml-2 flex-1 w-0 truncate">Dimanche: Fermé</span>
-                      </div>
-                    </li>
-                  </ul>
-                </dd>
-              </div>
-              <div className="bg-gray-50 px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Contact</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  <p>Téléphone: +33 1 23 45 67 89</p>
-                  <p>Email: contact@restaurant-saveurs.fr</p>
-                  <p>Site web: www.restaurant-saveurs.fr</p>
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </div>
 
-        {/* Galerie photos */}
-        <div className="mt-8">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-medium text-gray-900">Galerie photos</h2>
-            <button className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90">
-              Ajouter des photos
-            </button>
-          </div>
-          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {[1, 2, 3, 4, 5, 6].map(item => (
-              <div key={item} className="relative group">
-                <div className="aspect-w-1 aspect-h-1 rounded-lg bg-gray-100 overflow-hidden">
-                  <div className="h-48 bg-gray-200 rounded-lg"></div>
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <div className="flex items-center mb-6">
+                    {selectedEstablishment.logo_s3_key ? (
+                      <img
+                        src={`/api/images/${selectedEstablishment.logo_s3_key}`}
+                        alt={selectedEstablishment.name}
+                        className="w-20 h-20 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div
+                        className="w-20 h-20 rounded-full flex items-center justify-center text-white text-xl font-bold"
+                        style={{
+                          backgroundColor: selectedEstablishment.primary_color || '#e67e22',
+                        }}
+                      >
+                        {selectedEstablishment.name?.charAt(0) || '?'}
+                      </div>
+                    )}
+                    <div className="ml-4">
+                      <h3 className="text-xl font-bold text-gray-900">
+                        {selectedEstablishment.name}
+                      </h3>
+                      <p className="text-sm text-gray-500">{selectedEstablishment.address}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <h4 className="text-lg font-medium text-gray-900 mb-2">Description</h4>
+                    <p className="text-gray-600">
+                      {selectedEstablishment.description || 'Aucune description disponible.'}
+                    </p>
+                  </div>
+
+                  <div className="mt-6">
+                    <h4 className="text-lg font-medium text-gray-900 mb-2">Informations</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-gray-500">Prix</p>
+                        <p className="text-gray-900">
+                          {selectedEstablishment.price_range || 'Non défini'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Téléphone</p>
+                        <p className="text-gray-900">
+                          {selectedEstablishment.phone_country_code}{' '}
+                          {selectedEstablishment.phone_number || 'Non défini'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50 rounded-lg">
-                  <button className="text-white px-3 py-1 bg-red-600 rounded-md">Supprimer</button>
+
+                <div>
+                  <div className="bg-gray-100 rounded-lg p-4 h-80 flex items-center justify-center">
+                    <p className="text-gray-500 text-center">
+                      Prévisualisation mobile de votre profil.
+                      <br />
+                      Cliquez sur « Éditer le profil » pour voir une prévisualisation en direct.
+                    </p>
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </div>
