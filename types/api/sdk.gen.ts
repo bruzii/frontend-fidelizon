@@ -24,7 +24,7 @@ import type {
   EstablishmentControllerUpdateEstablishmentProfileData,
   EstablishmentControllerUpdateEstablishmentProfileResponse,
   EstablishmentControllerUploadEstablishmentProfilePicturesData,
-  EstablishmentControllerUploadEstablishmentProfilePicturesResponse,
+  EstablishmentControllerUploadEstablishmentLogoData,
 } from './types.gen';
 import { client as _heyApiClient } from './client.gen';
 
@@ -202,13 +202,28 @@ export const establishmentControllerUploadEstablishmentProfilePictures = <
 >(
   options: Options<EstablishmentControllerUploadEstablishmentProfilePicturesData, ThrowOnError>
 ) => {
-  return (options.client ?? _heyApiClient).post<
-    EstablishmentControllerUploadEstablishmentProfilePicturesResponse,
-    unknown,
-    ThrowOnError
-  >({
+  return (options.client ?? _heyApiClient).post<unknown, unknown, ThrowOnError>({
     ...formDataBodySerializer,
     url: '/establishments/{id}/pictures/{position}',
+    ...options,
+    headers: {
+      'Content-Type': null,
+      ...options?.headers,
+    },
+  });
+};
+
+/**
+ * Upload establishment profile logo
+ */
+export const establishmentControllerUploadEstablishmentLogo = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<EstablishmentControllerUploadEstablishmentLogoData, ThrowOnError>
+) => {
+  return (options.client ?? _heyApiClient).post<unknown, unknown, ThrowOnError>({
+    ...formDataBodySerializer,
+    url: '/establishments/{id}/logo',
     ...options,
     headers: {
       'Content-Type': null,

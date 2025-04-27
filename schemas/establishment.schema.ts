@@ -53,6 +53,7 @@ export const establishmentProfileSchema = z.object({
   social_media_links: socialMediaLinksSchema.optional().nullable(),
   delivery_links: deliveryLinksSchema.optional().nullable(),
   pictures: z.array(establishmentProfilePicturesSchema).optional().nullable(),
+  logo: z.any().optional().nullable(),
 });
 
 export type EstablishmentProfileFormValues = z.infer<typeof establishmentProfileSchema>;

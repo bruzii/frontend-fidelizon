@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useClientApi } from './use-client-api';
 import {
   establishmentControllerUpdateEstablishmentProfile,
+  establishmentControllerUploadEstablishmentLogo,
   establishmentControllerUploadEstablishmentProfilePictures,
 } from '@/types/api/sdk.gen';
 import { EstablishmentProfileFormValues } from '@/schemas/establishment.schema';
@@ -20,7 +21,7 @@ export const useEstablishmentProfile = (options?: UseEstablishmentProfileOptions
     profile: EstablishmentProfileFormValues
   ) => {
     if (!clientApi) return;
-    const { pictures, ...profileData } = profile;
+    const { pictures, logo, ...profileData } = profile;
 
     setIsLoading(true);
 
@@ -45,6 +46,18 @@ export const useEstablishmentProfile = (options?: UseEstablishmentProfileOptions
             })
           )
         );
+      }
+
+      // Manage logo
+      if (typeof profile.logo !== 'string') {
+        console.log('Uploading logo', profile.logo);
+        await establishmentControllerUploadEstablishmentLogo({
+          client: clientApi,
+          path: { id: establishmentId },
+          body: {
+            picture: profile.logo,
+          },
+        });
       }
 
       await establishmentControllerUpdateEstablishmentProfile({

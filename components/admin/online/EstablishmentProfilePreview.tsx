@@ -12,6 +12,7 @@ import { useEstablishmentHours } from '@/hooks/useEstablishmentHours';
 import { certificationLabels } from '@/hooks/useEstablishmentCertifications';
 import { SocialMediaLinks } from './SocialMediaLinks';
 import { OpeningStatus } from './OpeningStatus';
+import Image from 'next/image';
 
 interface EstablishmentProfilePreviewProps {
   address?: string;
@@ -29,6 +30,7 @@ export default function EstablishmentProfilePreview({
   const openingStatus = formatOpeningHours();
   const formValues = watch();
   const pictures = watch('pictures') || [];
+  const logo = watch('logo');
 
   const { primary_color, name, description, price_range, certifications, social_media_links } =
     formValues;
@@ -66,8 +68,25 @@ export default function EstablishmentProfilePreview({
 
       {/* Restaurant Info */}
       <div className="p-4">
-        <h2 className="text-xl font-bold mb-1">{name || 'XIU - Street-food'}</h2>
-        <p className="text-sm text-gray-600 mb-2">{address || '48 Rue Monge, 75005 Paris'}</p>
+        <div className="flex items-start gap-3 mb-3">
+          {/* Logo */}
+          {logo && (
+            <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-white shadow-md">
+              <Image
+                src={getFileUrlFromFileOrUrl(logo)}
+                alt="Logo"
+                width={64}
+                height={64}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          <div className="flex-1">
+            <h2 className="text-xl font-bold mb-1">{name || 'XIU - Street-food'}</h2>
+            <p className="text-sm text-gray-600">{address || '48 Rue Monge, 75005 Paris'}</p>
+          </div>
+        </div>
+
         <div className="flex items-center gap-3 mb-2">
           <div className="flex items-center">
             <div className="p-1 rounded-md" style={{ backgroundColor: primary_color }}>

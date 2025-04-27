@@ -190,8 +190,9 @@ export type PointDto = {
 };
 
 export type CreateEstablishmentDto = {
-  location?: PointDto;
   name: string;
+  location?: PointDto;
+  primary_color: string;
   public_establishment_id: string;
   google_place_id?: string;
   address: string;
@@ -199,7 +200,6 @@ export type CreateEstablishmentDto = {
   city: string;
   cep: string;
   logo_s3_key?: string;
-  primary_color?: string;
   description?: string;
   price_range?: string;
   phone_number?: string;
@@ -286,7 +286,9 @@ export type EstablishmentPictureResponseDto = {
 };
 
 export type EstablishmentResponseDto = {
+  name: string;
   location?: PointDto;
+  primary_color: string;
   opening_days?: Array<EstablishmentOpeningDaysDto>;
   social_media_links?: EstablishmentMediaSocialLinksDto | null;
   delivery_links?: EstablishmentDeliveryLinksDto | null;
@@ -297,16 +299,17 @@ export type EstablishmentResponseDto = {
    * The pictures of the establishment
    */
   pictures: Array<EstablishmentPictureResponseDto>;
+  /**
+   * The logo of the establishment
+   */
+  logo: string | null;
   id: string;
-  name: string;
   public_establishment_id: string;
   google_place_id?: string;
   address: string;
   neighborhood?: string;
   city: string;
   cep: string;
-  logo_s3_key?: string;
-  primary_color?: string;
   description?: string;
   price_range?: string;
   phone_number?: string;
@@ -314,6 +317,8 @@ export type EstablishmentResponseDto = {
 };
 
 export type UpdateEstablishmentProfileDto = {
+  name?: string;
+  primary_color?: string;
   opening_days?: Array<EstablishmentOpeningDaysDto>;
   social_media_links?: EstablishmentMediaSocialLinksDto | null;
   delivery_links?: EstablishmentDeliveryLinksDto | null;
@@ -324,11 +329,9 @@ export type UpdateEstablishmentProfileDto = {
   price_range?: string;
   phone_number?: string;
   phone_country_code?: string;
-  name?: string;
-  primary_color?: string;
 };
 
-export type PicturesDto = {
+export type PictureDto = {
   picture?: (Blob | File) | null;
 };
 
@@ -495,7 +498,7 @@ export type EstablishmentControllerUpdateEstablishmentProfileResponse =
   EstablishmentControllerUpdateEstablishmentProfileResponses[keyof EstablishmentControllerUpdateEstablishmentProfileResponses];
 
 export type EstablishmentControllerUploadEstablishmentProfilePicturesData = {
-  body: PicturesDto;
+  body: PictureDto;
   path: {
     id: string;
     position: number;
@@ -505,13 +508,21 @@ export type EstablishmentControllerUploadEstablishmentProfilePicturesData = {
 };
 
 export type EstablishmentControllerUploadEstablishmentProfilePicturesResponses = {
-  201: {
-    [key: string]: unknown;
-  };
+  201: unknown;
 };
 
-export type EstablishmentControllerUploadEstablishmentProfilePicturesResponse =
-  EstablishmentControllerUploadEstablishmentProfilePicturesResponses[keyof EstablishmentControllerUploadEstablishmentProfilePicturesResponses];
+export type EstablishmentControllerUploadEstablishmentLogoData = {
+  body: PictureDto;
+  path: {
+    id: string;
+  };
+  query?: never;
+  url: '/establishments/{id}/logo';
+};
+
+export type EstablishmentControllerUploadEstablishmentLogoResponses = {
+  201: unknown;
+};
 
 export type ClientOptions = {
   baseUrl: 'http://localhost:3000' | (string & {});

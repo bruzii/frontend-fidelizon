@@ -8,7 +8,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { CheckCircle2, Clock, Facebook, Globe, ImageIcon, Instagram, Loader2 } from 'lucide-react';
+import {
+  CheckCircle2,
+  Clock,
+  Facebook,
+  Globe,
+  ImageIcon,
+  Instagram,
+  Loader2,
+  Upload,
+} from 'lucide-react';
 import Image from 'next/image';
 import { EstablishmentProfileFormValues } from '@/schemas/establishment.schema';
 import { Input } from '@/components/ui/input';
@@ -17,6 +26,7 @@ import { getFileUrlFromFileOrUrl } from '@/utils/file';
 import { useEstablishmentPictures } from '@/hooks/useEstablishmentPictures';
 import { useEstablishmentHours } from '@/hooks/useEstablishmentHours';
 import { useEstablishmentCertifications } from '@/hooks/useEstablishmentCertifications';
+import { useEstablishmentLogo } from '@/hooks/useEstablishmentLogo';
 
 type Props = {
   onSubmit: (data: EstablishmentProfileFormValues) => void;
@@ -43,6 +53,9 @@ export default function EstablishmentProfileForm({ onSubmit, isLoading }: Props)
 
   const { certificationOptions, toggleCertification } = useEstablishmentCertifications(form);
 
+  const { logoInputRef, logo, handleLogoChange, handleLogoUploadClick, removeLogo } =
+    useEstablishmentLogo(form);
+
   const formValues = watch();
 
   // Initialize picture slots if they don't exist
@@ -66,6 +79,51 @@ export default function EstablishmentProfileForm({ onSubmit, isLoading }: Props)
 
         <TabsContent value="photos" className="space-y-6">
           <div className="space-y-4">
+            <h3 className="font-medium">Logo do Estabelecimento</h3>
+            <p className="text-sm text-gray-500">
+              Adicione um logo para o seu estabelecimento. Este logo será exibido no perfil.
+            </p>
+
+            <div className="flex items-center justify-center">
+              <div className="relative">
+                {logo ? (
+                  <>
+                    <div className="relative w-32 h-32 rounded-full overflow-hidden">
+                      <Image
+                        src={getFileUrlFromFileOrUrl(logo)}
+                        alt="Logo do estabelecimento"
+                        width={128}
+                        height={128}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className="absolute top-[-10px] right-[-10px] bg-black bg-opacity-50 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                      onClick={removeLogo}
+                    >
+                      ×
+                    </button>
+                  </>
+                ) : (
+                  <div
+                    onClick={handleLogoUploadClick}
+                    className="w-32 h-32 rounded-full border-2 border-dashed flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50"
+                  >
+                    <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                    <span className="text-sm text-gray-500">Adicionar logo</span>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  ref={logoInputRef}
+                  className="hidden"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleLogoChange}
+                />
+              </div>
+            </div>
+
             <h3 className="font-medium">Fotos do Estabelecimento</h3>
             <p className="text-sm text-gray-500">
               Upload até 3 fotos para o seu perfil. Estas fotos serão exibidas em um carrossel.

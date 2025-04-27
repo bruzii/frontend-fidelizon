@@ -13,6 +13,7 @@ import {
   EstablishmentProfileFormValues,
 } from '@/schemas/establishment.schema';
 import { UpdateEstablishmentProfileDto } from '@/types/api/types.gen';
+import Image from 'next/image';
 
 export default function OnlineProfilePage() {
   const [showEditor, setShowEditor] = useState(false);
@@ -58,6 +59,7 @@ export default function OnlineProfilePage() {
             file: existingPicture ? existingPicture.signedUrl : undefined,
           };
         }),
+        logo: selectedEstablishment.logo,
       });
     }
   }, [selectedEstablishment, methods]);
@@ -196,11 +198,13 @@ export default function OnlineProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <div className="flex items-center mb-6">
-                    {selectedEstablishment.logo_s3_key ? (
-                      <img
-                        src={`/api/images/${selectedEstablishment.logo_s3_key}`}
+                    {selectedEstablishment.logo ? (
+                      <Image
+                        src={selectedEstablishment.logo}
                         alt={selectedEstablishment.name}
-                        className="w-20 h-20 rounded-full object-cover"
+                        width={100}
+                        height={100}
+                        className="rounded-full object-cover"
                       />
                     ) : (
                       <div
