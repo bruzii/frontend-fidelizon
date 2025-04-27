@@ -202,8 +202,6 @@ export const useRegistrationAdmin = (
         return;
       }
 
-      // Préparer les établissements pour l'API
-      console.log({ formData });
       const establishmentsData = formData.establishments.map(
         (establishment: z.infer<typeof establishmentSchema>) => ({
           name: establishment.name,

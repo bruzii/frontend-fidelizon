@@ -192,7 +192,7 @@ export type PointDto = {
 export type CreateEstablishmentDto = {
   name: string;
   location?: PointDto;
-  primary_color: string;
+  primary_color?: string;
   public_establishment_id: string;
   google_place_id?: string;
   address: string;
@@ -288,7 +288,7 @@ export type EstablishmentPictureResponseDto = {
 export type EstablishmentResponseDto = {
   name: string;
   location?: PointDto;
-  primary_color: string;
+  primary_color?: string;
   opening_days?: Array<EstablishmentOpeningDaysDto>;
   social_media_links?: EstablishmentMediaSocialLinksDto | null;
   delivery_links?: EstablishmentDeliveryLinksDto | null;
