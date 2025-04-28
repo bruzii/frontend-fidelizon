@@ -1,3 +1,4 @@
+'use client';
 import { EstablishmentProfilePicturesSchema } from '@/src/schemas/establishment.schema';
 
 export const isFile = (value: File | string): value is File => {

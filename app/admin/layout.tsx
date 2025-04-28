@@ -16,14 +16,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const [isAuthPage, setIsAuthPage] = useState(true);
   const { isAuthenticated, isLoading } = useAuth();
 
-  if (
-    !isLoading &&
-    !isAuthenticated &&
-    pathname !== '/admin/auth/login' &&
-    pathname !== '/admin/auth/register'
-  ) {
-    redirect('/admin/auth/login');
-  }
+  // if (
+  //   !isLoading &&
+  //   !isAuthenticated &&
+  //   pathname !== '/admin/auth/login' &&
+  //   pathname !== '/admin/auth/register'
+  // ) {
+  //   redirect('/admin/auth/login');
+  // }
 
   useEffect(() => {
     setIsAuthPage(

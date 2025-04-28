@@ -5,12 +5,14 @@ import { tokenManager } from '@/src/utils/tokenManager';
 /**
  * Crée un client API pour les composants serveur
  */
-export const clientApi = createClient(
-  createConfig<ClientOptions>({
-    baseUrl: process.env.NEXT_PUBLIC_API_URL,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${tokenManager.getAccessToken()}`,
-    },
-  })
-);
+export const clientApi = tokenManager.getAccessToken()
+  ? createClient(
+      createConfig<ClientOptions>({
+        baseUrl: process.env.NEXT_PUBLIC_API_URL,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${tokenManager.getAccessToken()}`,
+        },
+      })
+    )
+  : null;
