@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import { RootState } from '@/store';
+import { RootState } from '@/src/store';
 import useClientAuth from '@/hooks/useClientAuth';
 
 export default function ClientDashboardPage() {

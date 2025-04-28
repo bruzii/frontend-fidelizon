@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import Link from 'next/link';
-import store from '@/store';
+import store from '@/src/store';
 
 interface MainLayoutProps {
   children: ReactNode;

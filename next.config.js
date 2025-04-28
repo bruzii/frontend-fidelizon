@@ -3,7 +3,12 @@ const nextConfig = {
   // Configuration pour accepter les sous-domaines en mode développement
   assetPrefix: '',
   images: {
-    domains: ['fidelizon-plateform-dev.s3.eu-north-1.amazonaws.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'fidelizon-plateform-dev.s3.eu-north-1.amazonaws.com',
+      },
+    ],
   },
   async headers() {
     return [

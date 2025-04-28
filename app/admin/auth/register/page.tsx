@@ -6,14 +6,13 @@ import { FormProvider } from 'react-hook-form';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
-// Components
-import StepProgress from '@/components/admin/register/StepProgress';
-import InformationStep from '@/components/admin/register/InformationStep';
-import BrandInformationStep from '@/components/admin/register/BrandInformationStep';
-import EstablishementStep from '@/components/admin/register/EstablishementStep';
+import StepProgress from './_components/StepProgress';
+import InformationStep from './_components/InformationStep';
+import BrandInformationStep from './_components/BrandInformationStep';
+import EstablishementStep from './_components/EstablishementStep';
 
 // Hooks
-import { useRegistrationAdmin } from '@/hooks/useRegistrationAdmin';
+import { useRegistrationAdmin } from '@/src/hooks/useRegistrationAdmin';
 
 /**
  * RegisterPage component - Handles the multi-step registration process

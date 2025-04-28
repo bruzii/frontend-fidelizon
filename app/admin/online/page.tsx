@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import EstablishmentProfileForm from '@/components/admin/online/EstablishmentProfileForm';
-import EstablishmentProfilePreview from '@/components/admin/online/EstablishmentProfilePreview';
+import EstablishmentProfileForm from '@/app/admin/online/_components/EstablishmentProfileForm';
+import EstablishmentProfilePreview from '@/app/admin/online/_components/EstablishmentProfilePreview';
 import { toast } from 'sonner';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,8 +11,7 @@ import { useEstablishmentProfile } from '@/hooks/useEstablishmentProfile';
 import {
   establishmentProfileSchema,
   EstablishmentProfileFormValues,
-} from '@/schemas/establishment.schema';
-import { UpdateEstablishmentProfileDto } from '@/types/api/types.gen';
+} from '@/src/schemas/establishment.schema';
 import Image from 'next/image';
 
 export default function OnlineProfilePage() {
