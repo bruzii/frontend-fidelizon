@@ -5,7 +5,6 @@ import {
   establishmentControllerUploadEstablishmentProfilePictures,
 } from '@/src/types/api/sdk.gen';
 import { EstablishmentProfileFormValues } from '@/src/schemas/establishment.schema';
-import { clientApi } from '../lib/api-client';
 
 interface UseEstablishmentProfileOptions {
   onSuccess?: () => void;
@@ -19,7 +18,6 @@ export const useEstablishmentProfile = (options?: UseEstablishmentProfileOptions
     establishmentId: string,
     profile: EstablishmentProfileFormValues
   ) => {
-    if (!clientApi) return;
     const { pictures, logo, ...profileData } = profile;
 
     setIsLoading(true);
@@ -34,7 +32,6 @@ export const useEstablishmentProfile = (options?: UseEstablishmentProfileOptions
         await Promise.all(
           picturesToUpload.map(picture =>
             establishmentControllerUploadEstablishmentProfilePictures({
-              client: clientApi,
               path: {
                 id: establishmentId,
                 position: picture.position,
@@ -51,7 +48,6 @@ export const useEstablishmentProfile = (options?: UseEstablishmentProfileOptions
       if (typeof profile.logo !== 'string') {
         console.log('Uploading logo', profile.logo);
         await establishmentControllerUploadEstablishmentLogo({
-          client: clientApi,
           path: { id: establishmentId },
           body: {
             picture: profile.logo,
@@ -60,7 +56,6 @@ export const useEstablishmentProfile = (options?: UseEstablishmentProfileOptions
       }
 
       await establishmentControllerUpdateEstablishmentProfile({
-        client: clientApi,
         path: {
           id: establishmentId,
         },

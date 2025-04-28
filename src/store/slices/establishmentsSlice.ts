@@ -27,14 +27,10 @@ const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
 // Action asynchrone pour charger les établissements
 export const fetchEstablishments = createAsyncThunk<
   EstablishmentResponseDto[],
-  { force?: boolean; clientApi: any } | undefined,
+  { force?: boolean } | undefined,
   { state: RootState }
 >('establishments/fetchEstablishments', async (options, { getState }) => {
-  const { force = false, clientApi } = options || {};
-
-  if (!clientApi) {
-    throw new Error('Client API is required');
-  }
+  const { force = false } = options || {};
 
   const { lastFetched, establishments } = getState().establishments;
 
@@ -47,10 +43,7 @@ export const fetchEstablishments = createAsyncThunk<
     return establishments;
   }
 
-  // Faire l'appel API
-  const response = await establishmentControllerGetEstablishments({
-    client: clientApi,
-  });
+  const response = await establishmentControllerGetEstablishments();
 
   if (!response.data) {
     throw new Error('Failed to fetch establishments');

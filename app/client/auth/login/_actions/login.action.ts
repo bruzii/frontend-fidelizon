@@ -1,12 +1,10 @@
 'use server';
 
-import { clientApi } from '@/src/lib/api-client';
 import { authControllerLogin, LoginDto, partnerControllerRegister } from '@/src/types/api';
 
 export async function loginAction(data: LoginDto) {
   try {
     const response = await authControllerLogin({
-      client: clientApi,
       body: data,
     });
 

@@ -11,7 +11,6 @@ import {
   selectIsLoading,
   selectError,
 } from '@/src/store/slices/establishmentsSlice';
-import { clientApi } from '../lib/api-client';
 
 /**
  * Hook personnalisé pour accéder et gérer les établissements via Redux
@@ -35,11 +34,9 @@ export const useEstablishments = () => {
   // Charger les établissements
   const loadEstablishments = useCallback(
     (force = false) => {
-      if (clientApi) {
-        dispatch(fetchEstablishments({ force, clientApi }));
-      }
+      dispatch(fetchEstablishments());
     },
-    [dispatch, clientApi]
+    [dispatch]
   );
 
   // Charger les établissements au montage du composant
